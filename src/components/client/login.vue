@@ -1,0 +1,100 @@
+<template>
+    <div class="login">
+        <div class="bg-gray-50 min-h-screen flex items-center justify-center">
+            <!-- Login container -->
+            <div class="bg-gray-100 flex shadow-lg max-w-4xl  p-5">
+                <!-- Form -->
+                <div class="md:w-1/2 px-16">
+                    <h2 class="font-bold text-2xl text-[#002d74]">Login</h2>
+                    <p class="text-sm mt-4 text-[#002d74]">If you already a member, easily log in</p>
+
+                    <Form class="flex flex-col gap-4" @submit="handleLogin" :validation-schema="loginFormSchema">
+                        <div>
+                            <Field class="p-2 rounded-xl border mt-8 w-full " type="text" name="userName"
+                                placeholder="Tên đăng nhập" v-model="userName" />
+                            <ErrorMessage name="userName" class="error-message" />
+                        </div>
+                        <div class="relative">
+                            <Field class="p-2 rounded-xl border w-full" type="password" name="password"
+                                placeholder="Mật khẩu" v-model="password" />
+                            <ErrorMessage name="password" class="error-message" />
+                            <!-- <span class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400">icon</span> -->
+                        </div>
+                        <button class="bg-[#002d74] rounded-xl text-white py-2">Log in</button>
+                    </Form>
+                    <div class="mt-10 grid grid-cols-3 items-center text-gray-500">
+                        <hr class="border-gray-500">
+                        <p class="text-center text-sm">OR</p>
+                        <hr class="border-gray-500">
+                    </div>
+
+                    <button class="bg-white border py-2 w-full rounded-xl mt-5 flex justify-center items-center">
+                        <!-- <span class="mr-3 text-sm">icon</span> -->
+                        Login with Google
+                    </button>
+
+                    <p class="mt-10 text-xs border-b py-6">Forgot your password?</p>
+                    <div class="text-sm flex justify-between items-center">
+                        <p>Don't have an account?</p>
+                        <router-link to="/register" class="py-2 px-4 bg-white border rounded-xl">Register</router-link>
+                    </div>
+                </div>
+                <!-- Image -->
+                <div class="w-1/2 md:block hidden">
+                    <img src="@/assets/images/image-login.avif" class="rounded-2xl">
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+import AuthService from "@/services/auth.service";
+import * as yup from "yup";
+import { Form, Field, ErrorMessage } from "vee-validate";
+import jwt_decode from "jwt-decode";
+import socket from "@/plugins/socket";
+
+export default {
+    components: {
+        Form,
+        Field,
+        ErrorMessage,
+    },
+    data() {
+        const loginFormSchema = yup.object().shape({
+            userName: yup
+                .string()
+                .required("Xin nhập vào trường này"),
+            password: yup
+                .string()
+                .required("Xin nhập vào trường này")
+        });
+
+        return {
+            userName: "",
+            password: "",
+            message: "",
+            loginFormSchema,
+        }
+    },
+    methods: {
+        async handleLogin() {
+            const data = {
+                userName: this.userName,
+                password: this.password,
+            }
+
+            try {
+                const response = await AuthService.login(data);
+                if (response.status === 200) {
+                    localStorage.setItem('access_token', response.data.accessToken);
+                    location.href = '/';
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    }
+}
+</script>

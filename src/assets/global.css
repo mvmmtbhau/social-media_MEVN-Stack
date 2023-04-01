@@ -1,0 +1,129 @@
+* {
+    margin: 0;
+    padding: 0;
+    outline: 0;
+    appearance: none;
+    text-decoration: none;
+    list-style: none;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    font-family: Arial, Helvetica, sans-serif;
+    user-select: none;
+    overflow-x: hidden;
+}
+
+.error-message {
+    color: red;
+    font-size: 14px
+}
+
+aside {
+    height: 100vh;
+    border-right: 1px solid;
+}
+
+aside .navigation {
+    height: 86vh;
+}
+
+/* .default {
+    margin-left: 16.666667%;
+} */
+
+.homeview {
+    display: grid;
+    gap: 4rem;
+    grid-template-columns: auto 20rem;
+}
+
+.homeview .post {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.upload_file_modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 20;
+}
+
+.detail_post_modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 20;
+}
+
+.upload_file_modal .modal_header {
+    border-bottom: 1px solid;
+}
+
+.modal_image {
+    border-right: 1px solid;
+}
+
+.info_user {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.border-1 {
+    border: 1px solid rgb(0, 0, 0);
+}
+
+.border-2 {
+    border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.border-left-1 {
+    border-left: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.border-bottom-1 {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.border-right-1 {
+    border-right: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.border-top-1 {
+    border-top: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.border-left-2 {
+    border-left: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.border-bottom-2 {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.border-right-2 {
+    border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.border-top-2 {
+    border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.insert-chat {
+    border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.message {
+    border: 1px solid rgba(0, 0, 0, 0.5);
+}
+
+.add_new_image {
+    background: rgba(0, 0, 0, 0.7);
+}

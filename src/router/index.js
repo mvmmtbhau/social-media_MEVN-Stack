@@ -1,0 +1,76 @@
+import { createRouter, createWebHistory } from 'vue-router';
+
+const router = createRouter({
+  history: createWebHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      name: 'Home',
+      component: () => import(/* webpackChunkName: "home" */'@/views/client/home.vue'),
+    },
+    {
+      path: '/p/:id',
+      name: 'DetailPost',
+      component: () => import(/* webpackChunkName: "detailPost" */'@/views/client/detailPost.vue'),
+    },
+    {
+      path: '/register',
+      name: 'Register',
+      meta: {
+        layout: 'auth',
+      },
+      component: () => import(/* webpackChunkName: "register" */'@/views/client/register.vue'),
+      props: true,
+    },
+    {
+      path: '/login',
+      name: 'Login',
+      meta: {
+        layout: 'auth',
+      },
+      component: () => import(/* webpackChunkName: "login" */'@/views/client/login.vue'),
+      props: true,
+    },
+    {
+      path: '/user/:id',
+      name: 'User',
+      component: () => import(/* webpackChunkName: "user" */'@/views/client/user.vue'),
+    },
+    {
+      path: '/inbox',
+      name: 'Inbox',
+      component: () => import(/* webpackChunkName: "inbox" */'@/views/client/inbox.vue'),
+      children: [
+        {
+          path: 't/:id',
+          name: 'ChatBox',
+          component: () => import(/* webpackChunkName: "chatBox" */'@/views/client/chat.vue'),
+        },
+      ],
+    },
+    {
+      path: '/accounts',
+      name: 'Edit',
+      component: () => import(/* webpackChunkName: "accounts" */'@/views/client/accounts.vue'),
+      children: [
+        {
+          path: 'edit',
+          name: 'EditAccount',
+          component: () => import(/* webpackChunkName: "accountEdit" */'@/views/client/editAccount.vue'),
+        },
+        {
+          path: 'change/password',
+          name: 'ChangePassword',
+          component: () => import(/* webpackChunkName: "changePassword" */'@/views/client/changePassword.vue'),
+        },
+        {
+          path: 'who_can_see_your_content',
+          name: 'WhoCanSeeYourContent',
+          component: () => import(/* webpackChunkName: "changePassword" */'@/views/client/whoCanSee.vue'),
+        },
+      ],
+    },
+  ]
+})
+
+export default router;
