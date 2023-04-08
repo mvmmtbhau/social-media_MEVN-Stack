@@ -3,36 +3,43 @@ const mongoose = require('mongoose');
 
 class FollowService {
     async create(req, res, next) {
-        const follow = new Follow({
-            owner: req.body.owner,
-            userFollowed: req.body.userFollowed,
-        });
-
         try {
-            const newFollow = await follow.save();
+            const fromUser = req.body.fromUser;
+            const followUser = req.body.followUser;
+            
+            const follow = new Follow({
+                fromUser: fromUser,
+                followUser: followUser._id,
+                state: followUser.private ? false : true,
+            });
 
-            if (newFollow) {
+            const saveFollow = await follow.save();
+
+            if (saveFollow) {
+                const newFollow = await Follow.findById(follow._id)
+                    .populate('fromUser', '-userName -password')
+                    .populate('followUser', '-userName -password');
                 const updateUserFollowing = await User.findByIdAndUpdate(
-                    follow.owner,
+                    follow.fromUser,
                     {
                         $push: {
                             follows: follow._id,
                         }
                     },
-                    { new: true, useFindAndModify: false },
                 );
 
                 const updateUserFollowed = await User.findByIdAndUpdate(
-                    follow.userFollowed,
+                    follow.followUser,
                     {
                         $push: {
                             hasFollowers: follow._id,
                         }
                     },
-                    { new: true, useFindAndModify: false },
                 );
+
+                return res.status(201).send(newFollow);
             }
-            return res.status(201).send(newFollow);
+
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
@@ -40,19 +47,22 @@ class FollowService {
     }
 
     async delete(req, res, next) {
-        const userFollowed = req.params.userFollowed;
-        const owner = req.params.userFollowing;
         try {
-            const follow = await Follow.findOne({
-                userFollowed: userFollowed,
-                owner: owner,
-            });
+            const fromUser = req.params.fromUserId;
+            const followUser = req.params.followUserId;
 
-            const result = await Follow.findByIdAndDelete(follow._id);
+            const follow = await Follow.findOne({
+                fromUser: fromUser,
+                followUser: followUser,
+            })
+
+            const result = await Follow.findByIdAndDelete({
+                _id: follow._id,
+            });
 
             if (result) {
                 const updateUserFollwing = await User.findByIdAndUpdate(
-                    owner,
+                    fromUser,
                     {
                         $pullAll: {
                             follows: [follow._id],
@@ -61,7 +71,7 @@ class FollowService {
                 );
 
                 const updateUserFollwed = await User.findByIdAndUpdate(
-                    userFollowed,
+                    followUser,
                     {
                         $pullAll: {
                             hasFollowers: [follow._id],
@@ -73,6 +83,26 @@ class FollowService {
 
         } catch (err) {
             console.log(err);
+            return res.status(500).json(err);
+        }
+    }
+
+    async update(req, res, next) {
+        try {
+            const followId = req.params.followId;
+
+            const getFollow = await Follow.findById(req.params.followId);
+
+            if (!getFollow) return res.status(204).send("Yêu cầu không tồn tại");
+
+            const updateFollow = await Follow.findByIdAndUpdate(
+                followId,
+                {
+                    state: true,
+                }
+            )
+            return res.status(200).send(updateFollow);
+        } catch (err) {
             return res.status(500).json(err);
         }
     }

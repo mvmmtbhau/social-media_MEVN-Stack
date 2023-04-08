@@ -10,7 +10,7 @@ router.post('/register', authController.signUp);
 
 router.post('/update/:id', upload.array('avatar', 1), authController.updateAccount);
 router.post('/change/password', authController.changePassword);
-
+router.post('/change/privateState/:id', authController.changePrivateState);
 
 router.get('/', authController.getAll);
 router.get('/profile/:id', authController.getUserById);

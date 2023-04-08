@@ -5,6 +5,8 @@ const followController = require('../controllers/follow.controller');
 
 router.post('/', followController.createFollow);
 
-router.delete('/unfollow/:userFollowed&:userFollowing', followController.deleteFollow)
+router.patch('/update/:followId', followController.updateStateFollow)
+
+router.delete('/unfollow/:fromUserId&:followUserId', followController.deleteFollow)
 
 module.exports = router;

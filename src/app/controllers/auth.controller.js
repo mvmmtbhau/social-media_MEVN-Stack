@@ -39,6 +39,10 @@ class AuthController {
         const response = await authService.changePassword(req, res, next);
     }
 
+    async changePrivateState(req, res, next) {
+        const response = await authService.changePrivateState(req, res, next);
+    }
+
     async login(req, res, next) {
         try {
             return await authService.login(req, res, next);

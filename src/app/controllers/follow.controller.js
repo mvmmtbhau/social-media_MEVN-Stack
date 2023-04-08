@@ -22,7 +22,11 @@ class FollowController {
                 new ApiError(500, err)
             )
         }
-    }    
+    }   
+    
+    async updateStateFollow(req, res,next) {
+        const response = await followService.update(req, res, next);
+    }
 }
 
 module.exports = new FollowController;

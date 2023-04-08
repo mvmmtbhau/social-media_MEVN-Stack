@@ -39,10 +39,21 @@ class AuthService {
         try {
             const filterUser = await User.findOne({
                 userName: req.body.userName,
-            })
-                .populate('posts')
-                .populate('follows', '-userName -password')
-                .populate('hasFollowers', '-userName -password');
+            }).populate('posts')
+                .populate({
+                    path: 'follows',
+                    populate: {
+                        path: 'followUser',
+                        select: '-userName -password',
+                    }
+                })
+                .populate({
+                    path: 'hasFollowers',
+                    populate: {
+                        path: 'fromUser',
+                        select: '-userName -password',
+                    }
+                });
 
             if (!filterUser) return res.status(400).json({ message: "Tên đăng nhập không đúng" });
 
@@ -74,8 +85,20 @@ class AuthService {
                 userName: 0,
                 password: 0,
             }).populate('posts')
-                .populate('follows', '-userName -password')
-                .populate('hasFollowers', '-userName -password')
+                .populate({
+                    path: 'follows',
+                    populate: {
+                        path: 'followUser',
+                        select: '-userName -password',
+                    }
+                })
+                .populate({
+                    path: 'hasFollowers',
+                    populate: {
+                        path: 'fromUser',
+                        select: '-userName -password',
+                    }
+                })
                 .populate('savedPosts');
 
             return res.status(200).send(user);
@@ -199,6 +222,33 @@ class AuthService {
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
+        }
+    }
+
+    async changePrivateState(req, res, next) {
+        try {
+            const userId = req.params.id;
+
+            const user = await User.findById(userId);
+
+            const newState = user.private ? false : true;
+
+            const updateUser = await User.findByIdAndUpdate(
+                userId,
+                {
+                    private: newState,
+                }
+            );
+            if (updateUser) {
+                return res.status(200).send({
+                    newState,
+                    message: newState ? 'Chuyển đổi tài khoản riêng tư thành công.' : 'Chuyển đổi tài khoản công khai thành công.'
+                });
+            }
+
+        } catch (err) {
+            console.log(err);
+            return res.status(500).send(err);
         }
     }
 }

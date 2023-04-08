@@ -4,11 +4,15 @@ mongoose.set('strictQuery', true);
 const Schema = mongoose.Schema;
 
 const FollowSchema = new Schema({
-    owner: {
+    state: {
+        type: Boolean,
+        default: true,
+    },
+    fromUser: {
         type: mongoose.Types.ObjectId, 
         ref: 'User',
     },
-    userFollowed: {
+    followUser: {
         type: mongoose.Types.ObjectId, 
         ref: 'User',
     },
