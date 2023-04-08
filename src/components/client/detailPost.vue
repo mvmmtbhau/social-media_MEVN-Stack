@@ -1,7 +1,7 @@
 <template>
     <div v-if="this.$store.state.post.post" class="fixed z-30">
         <div class="detail_post_modal flex items-center justify-center relative" @click="closeModal">
-            <font-awesome-icon icon="fa-solid fa-xmark" @click="closeModal"
+            <font-awesome-icon icon="fa-solid fa-xmark" @click.stop="closeModal"
                 class="absolute top-4 right-4 text-white text-2xl cursor-pointer" />
             <div class="modal bg-white h-[40rem] rounded-xl" @click.stop>
                 <div class="h-full">

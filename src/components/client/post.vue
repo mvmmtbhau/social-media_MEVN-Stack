@@ -38,10 +38,9 @@
                         @click="handleLike(post?._id, this.$store.state.auth.user?._id, index)" class="cursor-pointer" />
 
                     <font-awesome-icon icon="fa-regular fa-comment" class="cursor-pointer" @click="showModal(post?._id)" />
-                    <font-awesome-icon 
-                    v-if="this.$store.state.auth.user?.savedPosts && this.$store.state.auth.user?.savedPosts.length &&
-                    this.$store.state.auth.user?.savedPosts.some(id => id == post?._id)" icon="fa-solid fa-bookmark" class="absolute right-2 cursor-pointer"
-                        @click="removeSavedPost(post?._id)" />
+                    <font-awesome-icon v-if="this.$store.state.auth.user?.savedPosts && this.$store.state.auth.user?.savedPosts.length &&
+                        this.$store.state.auth.user?.savedPosts.some(id => id == post?._id)" icon="fa-solid fa-bookmark"
+                        class="absolute right-2 cursor-pointer" @click="removeSavedPost(post?._id)" />
                     <font-awesome-icon v-else icon="fa-regular fa-bookmark" class="absolute right-2 cursor-pointer"
                         @click="savedPost(post?._id)" />
                 </div>
@@ -50,7 +49,10 @@
                 <span class="font-bold">{{ post?.likes.length }} lượt thích</span>
                 <div class="">
                     <span class="font-bold mr-2">{{ post.owner?.fullName }}</span>
-                    <span>{{ post?.content }}</span>
+                    <span
+                        v-if="post?.content && post?.content.length && post?.content.length > 0 && post?.content != 'undefined'">
+                        {{ post?.content }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -58,15 +60,16 @@
 </template>
 
 <script>
-import { ref } from "@vue/runtime-core";
+import { onBeforeMount, ref } from "@vue/runtime-core";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
-import { onMounted } from "vue";
+import socket from "@/plugins/socket";
 
 import { publicImage } from "@/constants/";
+
 import postService from "@/services/post.service";
 import likeService from "@/services/like.service";
-import socket from "@/plugins/socket";
+import authService from "@/services/auth.service";
 
 export default {
     name: "Post",
@@ -79,15 +82,30 @@ export default {
             try {
                 const response = await postService.getAll();
                 if (response.status === 200) {
-                    posts.value = response.data;
+                    posts.value = response.data.filter(
+                        post => 
+                        store.state.auth.user.follows.some(follow => follow.followUser?._id == post.owner._id) 
+                        || post.owner._id == store.state.auth.user._id
+                        || !post.owner.private
+                        );
                 }
 
             } catch (err) {
                 console.log(err);
                 if (err.response.status === 401) {
-                    console.log("adasdas");
                     router.push({ name: "Login" });
                 }
+            }
+        }
+
+        const fetchUser = async () => {
+            try {
+                const response = await authService.getUserById(store.state.auth.user._id);
+                if(response.status == 200) {
+                    store.dispatch('auth/handleSetUser', response.data);
+                }
+            } catch (err) {
+                console.log(err);
             }
         }
 
@@ -165,7 +183,7 @@ export default {
 
 
                 const response = await postService.savedPost(data);
-                if(response.status == 201) {
+                if (response.status == 201) {
                     store.dispatch('auth/handleUpdateUserWithNewSavedPost', response.data._id);
                 }
 
@@ -184,7 +202,7 @@ export default {
                 console.log(data);
 
                 const response = await postService.removeSavedPost(data);
-                if(response.status == 201) {
+                if (response.status == 201) {
                     store.dispatch('auth/handleUpdateUserWithRemoveSavedPost', response.data._id);
                 }
 
@@ -193,7 +211,10 @@ export default {
             }
         }
 
-        fetchPosts();
+        onBeforeMount(() => {
+            fetchUser();
+            fetchPosts();
+        })
 
         socket?.on("getPost", data => {
             console.log(data);

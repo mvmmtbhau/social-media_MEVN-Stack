@@ -25,14 +25,12 @@ instance.interceptors.request.use(
 );
 instance.interceptors.response.use(
     function (response) {
-      // console.log("Đang đăng nhập bởi ai đó");
       return response;
     },
     async function (error) {
       const config = error.config;
       const response = error?.response;
       if (response.status === 401) {
-        console.log("Hết hạn đăng nhập");
         window.location.href ="/login";
         localStorage.removeItem('access_token');
         return Promise.reject(error);

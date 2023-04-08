@@ -34,6 +34,9 @@ const actions = {
     handleUpdateUserWithUnFollow({ commit }, follow) {
         commit("updateUserWithUnFollow", follow);
     },
+    handleUpdateUserWithNewFollowState({ commit }, follow) {
+        commit("updateUserWithNewFollowState", follow);
+    },
     handleUpdateUserWithNewSavedPost({ commit }, savedPost) {
         commit("updateUserWithNewSavedPost", savedPost);
     },
@@ -45,6 +48,9 @@ const actions = {
     },
     handleUpdateUserByIdWithUnFollow({ commit }, follow) {
         commit("updateUserByIdWithUnFollow", follow);
+    },
+    handleUpdateUserByIdWithNewFollowState({ commit }, follow) {
+        commit("updateUserByIdWithNewFollowState", follow);
     },
     handleUpdateSearchHistoryWithSearch({ commit }, search) {
         commit("updateSearchHistoryWithSearch", search);
@@ -58,6 +64,9 @@ const actions = {
     handleUpdateNotificationsWithNewNoti({ commit }, newNoti) {
         commit("updateNotificationsWithNewNoti", newNoti);
     },
+    handleUpdateUserWithNewPrivateState({ commit }, newState) {
+        commit("updateUserWithNewPrivateState", newState);
+    }
 };
 
 // mutations
@@ -78,14 +87,17 @@ const mutations = {
     setUserById(state, payload) {
         state.userById = payload;
     },
-    updateUserWithFollow(state, payload) {
-        state.user.follows = [...state.user.follows, payload];
+    updateUserWithNewPrivateState(state, payload) {
+        state.user.private = payload;
     },
     updateUserWithNewSavedPost(state, payload) {
         state.user.savedPosts = [...state.user.savedPosts, payload];
     },
     updateUserWithRemoveSavedPost(state, payload) {
         state.user.savedPosts = state.user.savedPosts.filter(id => id !== payload);
+    },
+    updateUserWithFollow(state, payload) {
+        state.user.follows = [...state.user.follows, payload];
     },
     updateUserWithUnFollow(state, payload) {
         state.user.follows = state.user.follows.filter(follow => follow._id !== payload._id);
@@ -108,7 +120,7 @@ const mutations = {
     updateNotificationsWithNewNoti(state, payload) {
         state.notifications = [...state.notifications, payload];
     },
-    
+
 };
 
 export default {

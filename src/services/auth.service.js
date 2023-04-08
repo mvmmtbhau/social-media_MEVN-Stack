@@ -33,6 +33,10 @@ class AuthService {
     async changePassword(data) {
         return (await this.api.post('/auth/change/password', data));
     }
+
+    async changePrivateState(userId) {
+        return (await this.api.post(`/auth/change/privateState/${userId}`, ));
+    }
 }
 
 export default new AuthService();

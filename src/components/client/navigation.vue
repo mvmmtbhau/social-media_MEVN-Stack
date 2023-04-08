@@ -74,7 +74,7 @@
                         </div>
                         <div v-if="isShowMore"
                             class="absolute bottom-12 left-3 w-48 rounded-md z-20 flex flex-col bg-black">
-                            <router-link to="/account/edit" class="py-2 px-2 flex items-center justify-between w-full cursor-pointer
+                            <router-link to="/accounts/edit" class="py-2 px-2 flex items-center justify-between w-full cursor-pointer
                                         hover:text-black hover:bg-white border-b-2 border-white hover:border-black">
                                 <span>Cài đặt</span>
                                 <font-awesome-icon icon="fa-solid fa-gear" />

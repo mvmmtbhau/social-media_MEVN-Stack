@@ -12,6 +12,9 @@
                     <div class="info_1 flex gap-3 items-center">
                         <div v-if="this.$store.state.auth.userById?._id == this.$store.state.auth.user?._id"
                             class="flex gap-3 items-center">
+                            <span class="text-xl font-bold">
+                                {{ this.$store.state.auth.userById?.fullName }}
+                            </span>
                             <router-link :to="{
                                 name: 'EditAccount'
                             }">
@@ -23,10 +26,14 @@
                         </div>
                         <div v-else class="">
                             <div v-if="
-                                this.$store.state.auth.user.follows.some(follow => follow.userFollowed === this.$store.state.auth.userById?._id)"
-                                class="flex gap-3 items-center">
+                                this.$store.state.auth.user?.follows.some(
+                                    follow => follow.followUser?._id == this.$store.state.auth.userById?._id
+                                        && follow.state)" class="flex gap-3 items-center">
+                                <span class="text-xl font-bold">
+                                    {{ this.$store.state.auth.userById?.fullName }}
+                                </span>
                                 <span
-                                    @click="handleUnFollow(this.$store.state.auth.userById?._id, this.$store.state.auth.user?._id)"
+                                    @click="handleUnFollow(this.$store.state.auth.user?._id, this.$store.state.auth.userById?._id)"
                                     class="bg-gray-200 px-2 py-2 rounded-md text-sm font-bold hover:-translate-y-1 cursor-pointer">
                                     Đang theo dõi
                                 </span>
@@ -35,38 +42,90 @@
                                     class="bg-gray-200 px-2 py-2 rounded-md text-sm font-bold cursor-pointer hover:scale-110">
                                     Nhắn tin
                                 </span>
-                                <span>Tùy chọn khác</span>
+                            </div>
+                            <div v-else-if="this.$store.state.auth.user?.follows.some(
+                                follow => follow.followUser?._id == this.$store.state.auth.userById?._id
+                                    && !follow.state
+                            )" class="flex gap-3 items-center">
+                                <span class="text-xl font-bold">
+                                    {{ this.$store.state.auth.userById?.fullName }}
+                                </span>
+                                <span
+                                    @click="handleUnFollow(this.$store.state.auth.user?._id, this.$store.state.auth.userById?._id)"
+                                    class="bg-gray-300 text-black px-3 py-2 rounded-md text-sm font-bold hover:-translate-y-1 cursor-pointer">
+                                    Đợi phản hồi
+                                </span>
                             </div>
                             <div v-else class="flex gap-3 items-center">
+                                <span class="text-xl font-bold">
+                                    {{ this.$store.state.auth.userById?.fullName }}
+                                </span>
                                 <span
-                                    @click="handleFollow(this.$store.state.auth.userById?._id, this.$store.state.auth.user?._id)"
+                                    @click="handleFollow(this.$store.state.auth.user._id, this.$store.state.auth.userById)"
                                     class="bg-blue text-white px-3 py-2 rounded-md text-sm font-bold hover:-translate-y-1 cursor-pointer">
                                     Theo dõi
                                 </span>
-                                <span>Tùy chọn khác</span>
                             </div>
                         </div>
                     </div>
-                    <div class="info_2 flex gap-10 py-2 items-center">
-                        <p class="flex gap-1">
-                            <span class="font-bold">
-                                {{ this.$store.state.auth.userById?.posts.length }}
-                            </span>
-                            <span>Bài viết</span>
-                        </p>
-                        <p class="flex gap-1">
-                            <span class="font-bold">
-                                {{ this.$store.state.auth.userById?.hasFollowers.length }}
-                            </span>
-                            <span>người theo dõi</span>
-                        </p>
-                        <p class="flex gap-1">
-                            <span>Đang theo dõi</span>
-                            <span class="font-bold">
-                                {{ this.$store.state.auth.userById?.follows.length }}
-                            </span>
-                            <span>người dùng</span>
-                        </p>
+                    <div class="info_2 flex flex-col gap-2 py-2">
+                        <div class="flex gap-4">
+                            <p class="flex gap-1" :class="{
+                                'cursor-pointer':
+                                    this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id
+                                    || !this.$store.state.auth.userById?.private
+                                    || this.$store.state.auth.userById?.private && this.$store.state.auth.user?.follows.some(
+                                        follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true)
+                            }"
+                                @click="
+                                    this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id
+                                        || !this.$store.state.auth.userById?.private
+                                        || this.$store.state.auth.userById?.private && this.$store.state.auth.user?.follows.some(
+                                            follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true) ? isShowFollowersModal = true : ''">
+                                <span class="font-bold">
+                                    {{
+                                        this.$store.state.auth.userById?.hasFollowers.filter(
+                                            follow => follow.state == true).length }}
+                                </span>
+                                <span>người theo dõi</span>
+                            </p>
+                            <p class="flex gap-1 " :class="{
+                                'cursor-pointer':
+                                    this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id
+                                    || !this.$store.state.auth.userById?.private
+                                    || this.$store.state.auth.userById?.private && this.$store.state.auth.user?.follows.some(
+                                        follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true)
+                            }"
+                                @click="this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id
+                                    || !this.$store.state.auth.userById?.private
+                                    || this.$store.state.auth.userById?.private && this.$store.state.auth.user?.follows.some(
+                                        follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true) ? isShowFollowingModal = true : ''">
+                                <span>Đang theo dõi</span>
+                                <span class="font-bold">
+                                    {{ this.$store.state.auth.userById?.follows.filter(
+                                        follow => follow.state == true).length }}
+                                </span>
+                                <span>người dùng</span>
+                            </p>
+                        </div>
+                        <div class="flex gap-4">
+                            <p class="flex gap-1">
+                                <span class="font-bold">
+                                    {{ this.$store.state.auth.userById?.posts.length }}
+                                </span>
+                                <span>bài viết</span>
+                            </p>
+                            <p class="flex gap-1 cursor-pointer"
+                                v-if="this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id"
+                                @click="isShowRequestModal = true">
+                                <span class="font-bold">
+                                    {{ this.$store.state.auth.userById?.hasFollowers.filter(follow => follow.state ==
+                                        false).length }}
+                                </span>
+                                <span>yêu cầu theo dõi</span>
+                            </p>
+                        </div>
+
                     </div>
                     <div class="info_3">
                         <div class="mb-2">
@@ -84,10 +143,17 @@
                 </div>
             </div>
         </div>
-        <div>
+        <div v-if="this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id
+            || !this.$store.state.auth.userById?.private
+            || this.$store.state.auth.userById?.private &&
+            this.$store.state.auth.user?.follows.some(
+                follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true)">
             <div class="flex gap-10 py-8 text-xs font-bold items-center justify-center">
-                <span class="cursor-pointer hover:scale-105 transition duration-300" :class="{ 'active': isShowPosts }" @click="isShowPosts = true">BÀI VIẾT</span>
-                <span v-if="this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id" class="cursor-pointer hover:scale-105 transition duration-300" :class="{ 'active': !isShowPosts }" @click="isShowPosts = false">ĐÃ LƯU</span>
+                <span class="cursor-pointer hover:scale-105 transition duration-300" :class="{ 'active': isShowPosts }"
+                    @click="isShowPosts = true">BÀI VIẾT</span>
+                <span v-if="this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id"
+                    class="cursor-pointer hover:scale-105 transition duration-300" :class="{ 'active': !isShowPosts }"
+                    @click="isShowPosts = false">ĐÃ LƯU</span>
             </div>
             <div>
                 <div v-if="isShowPosts" class="grid grid-cols-3 gap-4">
@@ -104,14 +170,202 @@
                 </div>
             </div>
         </div>
+        <div v-else class="flex flex-col gap-3 items-center mt-10">
+            <div class="border-2 py-2 px-3 rounded-full">
+                <font-awesome-icon :icon="['fas', 'lock']" class="text-2xl" />
+            </div>
+            <span class="text-sm">Đây là tài khoản riêng tư</span>
+            <span class="text-sm">Hãy theo dõi để có thể xem ảnh và video của họ.</span>
+        </div>
+
+
+        <div v-if="isShowFollowersModal" class="fixed z-20">
+            <div class="upload_file_modal flex items-center justify-center relative" @click="isShowFollowersModal = false">
+                <div class="modal bg-white h-[25rem] rounded-[0.6rem] w-[25rem]" @click.stop>
+                    <div class="relative py-3 border-b-2 text-center">
+                        <span class="font-[600]">Người theo dõi</span>
+                        <font-awesome-icon icon="fa-solid fa-xmark" class="absolute right-3 text-2xl cursor-pointer"
+                            @click="isShowFollowersModal = false" />
+                    </div>
+                    <div class="overflow-y-scroll overflow-x-hidden h-[21rem]">
+                        <div class="relative flex gap-3 px-4 py-2 items-center w-full"
+                            v-for="(follower) in this.$store.state.auth.userById?.hasFollowers" :key="follower">
+                            <img src="../../assets/images/no-avatar.jfif" class="w-12 h-12 rounded-full">
+                            <div class="flex items-center gap-1 text-sm">
+                                <span class="font-bold w-32 break-keep" v-if="follower.fromUser.fullName.length < 16">
+                                    {{ follower.fromUser.fullName }}
+                                </span>
+                                <span class="font-bold w-32 break-keep" v-else>
+                                    {{ follower.fromUser.fullName.substring(0, 13) + '...' }}
+                                </span>
+                                <div class="flex gap-1"
+                                    v-if="this.$store.state.auth.user?._id != follower.fromUser._id &&
+                                        !this.$store.state.auth.user?.follows.some(follow => follow.followUser?._id == follower.fromUser._id)">
+                                    <p class="text-gray-400">-</p>
+                                    <span @click="handleFollow(this.$store.state.auth.user._id, follower.fromUser)"
+                                        class="text-cyan-500 hover:text-cyan-700 cursor-pointer">
+                                        Theo dõi
+                                    </span>
+                                </div>
+                            </div>
+                            <span v-if="this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id"
+                                @click="showDeleteModal(follower.fromUser)"
+                                class="absolute right-4 text-sm bg-gray-200 py-1 px-2 font-bold cursor-pointer hover:bg-gray-300 rounded-md">
+                                Xóa
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="isShowDeleteFollowerModal" class="fixed z-30">
+            <div class="upload_file_modal flex items-center justify-center relative"
+                @click="isShowDeleteFollowerModal = false">
+                <div class="modal bg-white h-[20rem] rounded-[0.6rem] w-[25rem]" @click.stop>
+                    <div class="flex flex-col gap-4 items-center border-b-2 py-4">
+                        <img v-if="follower.avatar" :src="publicImage + follower.avatar.filename"
+                            class="w-20 h-20 rounded-full">
+                        <img v-else src="../../assets/images/no-avatar.jfif" class="w-20 h-20 rounded-full">
+                        <div class="flex flex-col gap-2 items-center w-[80%]">
+                            <p class="text-xl font-bold">Xóa người theo dõi?</p>
+                            <p class="text-center text-sm text-gray-500">
+                                Instafake sẽ không cho {{ follower.fullName }} biết rằng bạn đã xóa họ khỏi danh
+                                sách người theo dõi mình.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span
+                            @click="handleUnFollow(follower._id, this.$store.state.auth.user?._id); isShowDeleteFollowerModal = false"
+                            class="text-red text-center font-bold py-3 w-full border-b-2 cursor-pointer">
+                            Xóa
+                        </span>
+                        <span @click="isShowDeleteFollowerModal = false" class="w-full text-center py-3 cursor-pointer">
+                            Hủy
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="isShowFollowingModal" class="fixed z-20">
+            <div class="upload_file_modal flex items-center justify-center relative" @click="isShowFollowingModal = false">
+                <div class="modal bg-white h-[25rem] rounded-[0.6rem] w-[25rem]" @click.stop>
+                    <div class="relative py-3 border-b-2 text-center">
+                        <span class="font-[600]">Đang theo dõi</span>
+                        <font-awesome-icon icon="fa-solid fa-xmark" class="absolute right-3 text-2xl cursor-pointer"
+                            @click="isShowFollowingModal = false" />
+                    </div>
+                    <div class="overflow-y-scroll overflow-x-hidden h-[21rem]">
+                        <div class="relative flex gap-3 px-4 py-2 items-center w-full"
+                            v-for="following in this.$store.state.auth.userById?.follows.filter(follow => follow.state == true)"
+                            :key="following">
+                            <img src="../../assets/images/no-avatar.jfif" class="w-12 h-12 rounded-full">
+                            <div class="flex items-center gap-1 text-sm">
+                                <span class="font-bold w-32 break-keep" v-if="following.followUser?.fullName.length < 16">
+                                    {{ following.followUser?.fullName }}
+                                </span>
+                                <span class="font-bold w-32 break-keep" v-else>
+                                    {{ following.followUser?.fullName.substring(0, 13) + '...' }}
+                                </span>
+                            </div>
+                            <div class="absolute right-4"
+                                v-if="this.$store.state.auth.user?._id != following.followUser._id">
+                                <span v-if="!this.$store.state.auth.user?.follows.length
+                                    || this.$store.state.auth.user?.follows.length 
+                                    && !this.$store.state.auth.user?.follows.some(follow => follow.followUser._id == following.followUser._id)"
+                                    @click="handleFollow(this.$store.state.auth.user?._id, following.followUser)"
+                                    class=" right-4 text-sm text-white bg-cyan-500 py-1 px-2 font-bold cursor-pointer hover:bg-cyan-600 rounded-md">
+                                    Theo dõi
+                                </span>
+                                <span v-else @click="showDeleteFollowingModal(following.followUser)"
+                                    class=" right-4 text-sm bg-gray-200 py-1 px-2 font-bold cursor-pointer hover:bg-gray-300 rounded-md">
+                                    {{ 
+                                    this.$store.state.auth.user?.follows.some(follow => follow.followUser._id == following.followUser._id && follow.state == true) 
+                                    ? 'Đang theo dõi' : 'Đợi phản hồi'
+                                    }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div v-if="isShowDeleteFollowingModal" class="fixed z-30">
+            <div class="upload_file_modal flex items-center justify-center relative"
+                @click="isShowDeleteFollowingModal = false">
+                <div class="modal bg-white h-[20rem] rounded-[0.6rem] w-[25rem]" @click.stop>
+                    <div class="flex flex-col gap-6 items-center border-b-2 py-10">
+                        <img v-if="follower.avatar" :src="publicImage + follower.avatar.filename"
+                            class="w-24 h-24 rounded-full">
+                        <img v-else src="../../assets/images/no-avatar.jfif" class="w-24 h-24 rounded-full">
+                        <div class="flex flex-col items-center w-[80%]">
+                            <p class="text-center text-sm text-gray-500">
+                                {{ follower.private
+                                    ? 'Nếu đổi ý, bạn sẽ phải yêu cầu theo dõi lại @' + follower.fullName + '.'
+                                    : 'Bỏ theo dõi @' + follower.fullName + '?' }}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <span
+                            @click="handleUnFollow(this.$store.state.auth.user?._id, follower._id); isShowDeleteFollowingModal = false"
+                            class="text-red text-center font-bold w-full border-b-2 cursor-pointer"
+                            :class="[follower.private ? 'p-2' : 'p-3']">
+                            Bỏ theo dõi
+                        </span>
+                        <span @click="isShowDeleteFollowingModal = false" class="w-full text-center py-2 cursor-pointer">
+                            Hủy
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="isShowRequestModal" class="fixed z-20">
+            <div class="upload_file_modal flex items-center justify-center relative" @click="isShowRequestModal = false">
+                <div class="modal bg-white h-[25rem] rounded-[0.6rem] w-[25rem]" @click.stop>
+                    <div class="relative py-3 border-b-2 text-center">
+                        <span class="font-[600]">Yêu cầu theo dõi</span>
+                        <font-awesome-icon icon="fa-solid fa-xmark" class="absolute right-3 text-2xl cursor-pointer"
+                            @click="isShowRequestModal = false" />
+                    </div>
+                    <div class="overflow-y-scroll overflow-x-hidden h-[21rem]">
+                        <div class="relative flex gap-3 px-4 py-2 items-center w-full"
+                            v-for="(request, index) in this.$store.state.auth.userById?.hasFollowers.filter(follow => follow.state == false)"
+                            :key="request">
+                            <img v-if="request.fromUser?.avatar" :src="publicImage + request.fromUser.avatar.filename"
+                                class="w-12 h-12 rounded-full">
+                            <img v-else src="../../assets/images/no-avatar.jfif" class="w-12 h-12 rounded-full">
+                            <div class="flex items-center gap-1 text-sm">
+                                <span class="font-bold w-32 break-keep" v-if="request.fromUser.fullName.length < 16">
+                                    {{ request.fromUser.fullName }}
+                                </span>
+                                <span class="font-bold w-32 break-keep" v-else>
+                                    {{ request.fromUser.fullName.substring(0, 16) + '...' }}
+                                </span>
+                            </div>
+                            <div class="absolute right-2 flex gap-1">
+                                <span @click="handleUnFollow(request.fromUser._id, request.followUser)"
+                                    class=" text-sm bg-gray-200 py-1 px-2 font-bold cursor-pointer hover:bg-gray-300 rounded-md">
+                                    Xóa
+                                </span>
+                                <span @click="handleUpdateFollow(request._id, index)"
+                                    class="text-sm bg-cyan-500 text-white py-1 px-2 font-bold cursor-pointer hover:bg-cyan-600 rounded-md">
+                                    Chấp nhận
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </template>
 
 <script>
 import authService from '@/services/auth.service';
 import followService from '@/services/follow.service';
-import commentService from '@/services/comment.service';
-import postService from '@/services/post.service';
 import conversationService from '@/services/conversation.service';
 import { ref } from '@vue/reactivity';
 import { publicImage } from "@/constants/";
@@ -125,15 +379,21 @@ export default {
         const store = useStore();
         const route = useRoute();
         const router = useRouter();
-        const userId = ref();
-        const isShowPosts = ref(true);
 
-        const pathName = ref(location.pathname);
-        console.log(pathName.value);
+        const userId = ref();
+        const follower = ref();
+
+        const isShowPosts = ref(true);
+        const isShowFollowersModal = ref(false);
+        const isShowFollowingModal = ref(false);
+        const isShowRequestModal = ref(false);
+        const isShowDeleteFollowerModal = ref(false);
+        const isShowDeleteFollowingModal = ref(false);
 
         onBeforeMount(() => {
             userId.value = route.params.id;
             fetchUserById(userId.value);
+            fetchCurrentUser();
         })
 
         const fetchUserById = async (userId) => {
@@ -147,33 +407,58 @@ export default {
             }
         }
 
-        const handleFollow = async (userFollowed, userFollowing) => {
-            console.log(userFollowed, userFollowing);
-            const data = {
-                owner: userFollowing,
-                userFollowed: userFollowed,
-            }
-
+        const fetchCurrentUser = async () => {
             try {
-                const response = await followService.following(data);
-                if (response.status == 201) {
-                    store.dispatch("auth/handleUpdateUserWithFollow", response.data);
-                    store.dispatch("auth/handleUpdateUserByIdWithFollow", response.data);
-                    console.log('Follow thành công');
+                const response = await authService.getUserById(store.state.auth.user._id);
+                if (response.status == 200) {
+                    store.dispatch('auth/handleSetUser', response.data);
                 }
             } catch (err) {
                 console.log(err);
             }
         }
 
-        const handleUnFollow = async (userFollowed, userFollowing) => {
+        const handleFollow = async (fromUser, followUser) => {
             try {
-                const response = await followService.unFollow(userFollowed, userFollowing);
-                if (response.status == 200 || response.status == 204) {
-                    store.dispatch("auth/handleUpdateUserWithUnFollow", response.data);
-                    store.dispatch("auth/handleUpdateUserByIdWithUnFollow", response.data);
-                    console.log('unFollow thành công')
+                const data = {
+                    fromUser,
+                    followUser,
                 }
+
+                const response = await followService.following(data);
+                if (response.status == 201) {
+                    fetchCurrentUser();
+                    fetchUserById(userId.value);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        const handleUnFollow = async (fromUser, followUser) => {
+            try {
+                const response = await followService.unFollow(fromUser, followUser);
+                if (response.status == 200 || response.status == 204) {
+                    fetchCurrentUser();
+                    fetchUserById(userId.value);
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        const handleUpdateFollow = async (followId, index) => {
+            try {
+                const response = await followService.updateState(followId);
+                if (response.status == 204) {
+                    console.log(response.data);
+                }
+
+                if (response.status == 200) {
+                    fetchCurrentUser();
+                    fetchUserById(store.state.auth.userById?._id);
+                }
+
             } catch (err) {
                 console.log(err);
             }
@@ -206,14 +491,33 @@ export default {
             })
         }
 
+        const showDeleteModal = (follow) => {
+            follower.value = follow;
+            isShowDeleteFollowerModal.value = true;
+        }
+
+        const showDeleteFollowingModal = (following) => {
+            follower.value = following;
+            isShowDeleteFollowingModal.value = true;
+        }
+
         return {
             showModal,
+            showDeleteModal,
+            showDeleteFollowingModal,
             handleFollow,
             handleUnFollow,
+            handleUpdateFollow,
             handleCreateConversation,
             userId,
+            follower,
             publicImage,
-            isShowPosts
+            isShowPosts,
+            isShowFollowersModal,
+            isShowFollowingModal,
+            isShowRequestModal,
+            isShowDeleteFollowerModal,
+            isShowDeleteFollowingModal,
         }
     },
     data() {
