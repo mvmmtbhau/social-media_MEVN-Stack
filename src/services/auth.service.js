@@ -5,16 +5,20 @@ class AuthService {
         this.api = instance;
     }
 
-    async getUserById(userId) {
-        return (await this.api.get(`/auth/profile/${userId}`));  
-    }
-
     async register(data) {
         return (await this.api.post('/auth/register', data));   
     }
 
     async login(data){
         return (await this.api.post('/auth/login', data));
+    }
+
+    async getUserById(userId) {
+        return (await this.api.get(`/auth/profile/${userId}`));  
+    }
+
+    async getUsers(userId) {
+        return (await this.api.get(`/auth/${userId}`));
     }
 
     async updateAccount(data){

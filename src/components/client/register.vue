@@ -8,7 +8,7 @@
             <h2 class="font-bold text-2xl text-[#002d74]">Sign Up</h2>
             <p class="text-sm my-4 text-[#002d74]">If you already a member, easily log in</p>
   
-            <Form class="flex flex-col gap-4" @submit="handleSignUp" :validation-schema="signUpFormSchema">
+            <Form class="flex flex-col gap-4" @submit="handleSignUp" :validation-schema="signUpFormSchema" autocomplete="off">
                 <Field name="fullName" v-model="fullName" class="py-2 px-4 max-w-full rounded-xl border" type="text"
                     placeholder="Tên đầy đủ" />
                   <ErrorMessage class="error-message" name="fullName" />
@@ -81,10 +81,7 @@
         password: yup
           .string()
           .required("Xin nhập vào trường này")
-          .matches(
-            "^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$",
-            "Ít nhất 8 kí tự, phải có kí tự thường, in hoa và kí tự đặc biệt (@$!%*#?&)"
-          ),
+          .min(8, 'Mật khẩu ít nhất 8 kí tự'),
         passwordConfirm: yup
           .string()
           .required("Xin nhập vào trường này")

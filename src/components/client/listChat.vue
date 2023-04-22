@@ -56,8 +56,20 @@ export default {
         const conversations = ref();
 
         onBeforeMount(() => {
-            conversations.value = store.state.auth?.conversations;
+            getConversations(store.state.auth.user?._id);
         })
+        
+        const getConversations = async (userId) => {
+            try {
+                const response = await conversationService.getConversationsByUserId(userId);
+                if (response.status == 200) {
+                    store.dispatch("auth/handleSetConversations", response.data);
+                    conversations.value = store.state.auth?.conversations;
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
 
         const handleSelectChatbox = async (selectedId) => {
             router.push({

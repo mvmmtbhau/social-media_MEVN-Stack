@@ -29,10 +29,6 @@ aside .navigation {
     height: 86vh;
 }
 
-/* .default {
-    margin-left: 16.666667%;
-} */
-
 .homeview {
     display: grid;
     gap: 4rem;

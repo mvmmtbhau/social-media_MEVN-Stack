@@ -12,10 +12,10 @@ const getters = {
 
 // actions
 const actions = {
-    handleDetailPost({ commit }, post) {
+    handleSetDetailPost({ commit }, post) {
         commit("setDetailPost", post);
     },
-    handleComments({ commit }, comments) {
+    handleSetComments({ commit }, comments) {
         commit("setComments", comments);
     },
     handleUpdatePostWithLike({commit}, like) {
@@ -43,12 +43,12 @@ const mutations = {
     updateCommentsWithLike(state, payload) {
         state.comments[payload.index].likes = [
             ...state.comments[payload.index].likes,
-            payload.response.data,
+            payload.newLikeComment,
            ]
     },
     updateCommentsWithDislike(state, payload) {
         state.comments[payload.index].likes = 
-        state.comments[payload.index].likes.filter(like => like._id !== payload.response.data._id);
+        state.comments[payload.index].likes.filter(like => like._id !== payload.newLikeComment._id);
     },
     updatePostWithLike(state, payload) {
         state.post.likes = [...state.post.likes, payload];

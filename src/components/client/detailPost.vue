@@ -63,7 +63,9 @@
                                                 {{ this.$store.state.post.post?.content }}
                                             </div>
                                             <div class="text-gray-500 flex gap-3">
-                                                <span>1 ngày</span>
+                                                <span>
+                                                    {{ setTime(this.$store.state.post.post.createdAt) }}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -71,13 +73,13 @@
                                         v-for="(comment, index) in this.$store.state.post.comments" :key="index">
                                         <font-awesome-icon
                                             v-if="comment?.likes && comment?.likes.length &&
-                                                comment?.likes.some(like => like.owner === this.$store.state.auth.user._id)"
+                                                comment?.likes.some(like => like.owner == this.$store.state.auth.user._id)"
                                             icon="fa-solid fa-heart"
                                             class="absolute top-0 right-0 cursor-pointer hover:scale-105 text-red"
-                                            @click="handleUnLikeComment(comment._id, this.$store.state.auth.user._id, index)" />
+                                            @click="unLikeComment(comment._id, this.$store.state.auth.user._id, index)" />
                                         <font-awesome-icon v-else icon="fa-regular fa-heart"
                                             class="absolute top-0 right-0 cursor-pointer hover:scale-105"
-                                            @click="handleLikeComment(comment._id, this.$store.state.auth.user._id, index)" />
+                                            @click="likeComment(comment._id, this.$store.state.auth.user._id, index)" />
 
                                         <router-link :to="{
                                             name: 'User',
@@ -94,15 +96,18 @@
                                             <router-link :to="{
                                                 name: 'User',
                                                 params: { id: comment?.owner._id }
-                                            }" class="font-bold">
+                                            }" class="font-bold w-fit">
                                                 {{ comment?.owner.fullName }}
                                             </router-link>
                                             <div class="break-words w-[90%]">
                                                 {{ comment?.text }}
                                             </div>
-                                            <div class="text-gray-500 flex gap-3">
-                                                <span>1 ngày</span>
+                                            <div class="text-gray-500 flex gap-3 items-center">
+                                                <span>
+                                                    {{ setTime(comment.createdAt) }}
+                                                </span>
                                                 <span>{{ comment?.likes.length }} lượt thích</span>
+                                                <font-awesome-icon :icon="['fas', 'ellipsis']" class="text-xl cursor-pointer" />
                                             </div>
                                         </div>
                                     </div>
@@ -113,14 +118,21 @@
                                     <font-awesome-icon
                                         v-if="this.$store.state.post.post?.likes && this.$store.state.post.post?.likes.length &&
                                             this.$store.state.post.post?.likes.some(like => like.owner === this.$store.state.auth.user._id)"
-                                        @click="handleUnLike(this.$store.state.post.post?._id, this.$store.state.auth.user._id)"
+                                        @click="unLikePost(this.$store.state.post.post?._id, this.$store.state.auth.user._id)"
                                         icon="fa-solid fa-heart" class="cursor-pointer text-red " />
 
                                     <font-awesome-icon v-else icon="fa-regular fa-heart"
-                                        @click="handleLike(this.$store.state.post.post?._id, this.$store.state.auth.user._id)"
+                                        @click="likePost(this.$store.state.post.post?._id, this.$store.state.auth.user._id)"
                                         class="cursor-pointer" />
                                     <font-awesome-icon icon="fa-regular fa-comment" />
-                                    <font-awesome-icon icon="fa-regular fa-bookmark" class="absolute right-4" />
+                                    <font-awesome-icon icon="fa-solid fa-bookmark" class="absolute right-4 cursor-pointer"
+                                        v-if="this.$store.state.auth.user?.savedPosts.length
+                                            && this.$store.state.auth.user?.savedPosts.length > 0 &&
+                                            this.$store.state.auth.user?.savedPosts.some(id => id == this.$store.state.post.post?._id)"
+                                        @click="removeSavedPost(this.$store.state.post.post?._id, this.$store.state.auth.user?._id)" />
+                                    <font-awesome-icon v-else icon="fa-regular fa-bookmark"
+                                        class="absolute right-4 cursor-pointer"
+                                        @click="savedPost(this.$store.state.post.post?._id, this.$store.state.auth.user?._id)" />
                                 </div>
                                 <div class="px-4 py-2 flex flex-col gap-2">
                                     <p class="flex gap-2">
@@ -130,16 +142,16 @@
                                         <span>lượt thích</span>
                                     </p>
                                     <p class="text-sm text-gray-500">
-                                        1 ngày trước
+                                        {{ setTime(this.$store.state.post.post.createdAt) +' trước' }}
                                     </p>
                                 </div>
                                 <div class="flex items-center gap-2 px-4">
                                     <font-awesome-icon class="text-2xl" icon="fa-regular fa-face-smile" />
                                     <input v-model="comment" type="text"
-                                        @keydown.enter.exact="handleComment(this.$store.state.post.post._id, this.$store.state.auth.user._id)"
+                                        @keydown.enter.exact="commentPost(comment, this.$store.state.post.post._id, this.$store.state.auth.user._id); comment = ''"
                                         class="py-2 w-[80%] break-word" placeholder="Thêm bình luận">
                                     <span class="px-2 cursor-pointer text-cyan-500 font-bold"
-                                        @click="handleComment(this.$store.state.post.post._id, this.$store.state.auth.user._id)">Đăng</span>
+                                        @click="commentPost(this.$store.state.post.post._id, this.$store.state.auth.user._id)">Đăng</span>
                                 </div>
                             </div>
                         </div>
@@ -157,12 +169,8 @@ import { ref } from '@vue/reactivity';
 import { onBeforeMount, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 
-import commentService from "@/services/comment.service";
-import postService from "@/services/post.service";
-import likeService from "@/services/like.service";
-import likeCommentService from "@/services/likeComment.service";
-
-import socket from "@/plugins/socket";
+import usePost from "@/uses/usePost";
+import useUser from "@/uses/useUser";
 
 export default {
     name: 'detailPost',
@@ -171,145 +179,52 @@ export default {
         const router = useRouter();
         const route = useRoute();
 
+        const showMoreOptions = ref(false);
+
+        const {
+            getPostById,
+            likePost,
+            unLikePost,
+            commentPost,
+            likeComment,
+            unLikeComment,
+            savedPost,
+            removeSavedPost,
+            setTime,
+        } = usePost();
+
+        const {
+            getUserById
+        } = useUser();
+
         const comment = ref();
-        const detailPost = ref();
-        const comments = ref();
-        const likePosts = ref();
-        const likeComments = ref();
         const postId = ref();
 
-        onBeforeMount(() => {
+        onBeforeMount(async () => {
             postId.value = route.params.id;
-            fetchData(postId.value);
+            await getPostById(postId.value);
         })
-
-        const fetchData = async (postId) => {
-            try {
-                const response = await postService.getPostById(postId);
-                const comments = await commentService.getCommentsByPostId(postId);
-
-                if (response.status == 200 && comments.status == 200) {
-                    store.dispatch('post/handleDetailPost', response.data);
-                    store.dispatch('post/handleComments', comments.data);
-                }
-            } catch (err) {
-                console.log(err);
-            }
-        }
 
         const closeModal = () => {
             router.back();
-            store.dispatch("post/handleDetailPost", null);
-            store.dispatch("post/handleComments", null);
-        }
-
-        const handleComment = async (postId, userId) => {
-            console.log(postId, userId, comment.value);
-
-            const data = {
-                text: comment.value,
-                belongToPost: postId,
-                owner: userId,
-            };
-
-            try {
-                const response = await commentService.createComment(data);
-                if (response.status == 201) {
-                    comment.value = '';
-
-                    if (!response.data.newNoti) {
-                        comments.value = [...store.state.post.comments, response.data];
-                        store.dispatch("post/handleComments", comments.value);
-                        console.log('Không có thông báo');
-                        return;
-                    }
-                    console.log('Có thông báo');
-
-                    comments.value = [...store.state.post.comments, response.data.newComment];
-                    store.dispatch("post/handleComments", comments.value);
-
-                    socket.emit('createComment', response.data.newNoti)
-
-                }
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        const handleLike = async (postId, userId) => {
-            try {
-                const data = {
-                    belongToPost: postId,
-                    owner: userId,
-                }
-
-                const response = await likeService.likePost(data);
-                if (response.status == 201) {
-                    store.dispatch("post/handleUpdatePostWithLike", response.data);
-                }
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        const handleUnLike = async (postId, userId) => {
-            try {
-                const response = await likeService.unLikePost(postId, userId);
-                if (response.status == 200 || response.status == 204) {
-                    store.dispatch("post/handleUpdatePostWithDislike", response.data);
-                    console.log("Bỏ thích thành công");
-                }
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        const handleLikeComment = async (commentId, userId, index) => {
-            try {
-                const data = {
-                    belongToComment: commentId,
-                    owner: userId,
-                }
-
-                const response = await likeCommentService.likeComment(data);
-                if (response.status == 201) {
-                    console.log("Thích thành công")
-                    store.dispatch('post/handleUpdateCommentsWithLike', { response, index });
-                }
-
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        const handleUnLikeComment = async (commentId, userId, index) => {
-            try {
-                const data = {
-                    belongToComment: commentId,
-                    owner: userId,
-                }
-
-                const response = await likeCommentService.unlikeComment(commentId, userId);
-                if (response.status == 200 || response.status == 204) {
-                    console.log("Bỏ thích comment thành công")
-                    store.dispatch('post/handleUpdateCommentsWithDislike', { response, index });
-                }
-            } catch (err) {
-                console.log(err);
-            }
+            store.dispatch("post/handleSetDetailPost", null);
+            store.dispatch("post/handleSetComments", null);
         }
 
         return {
             closeModal,
-            handleComment,
-            handleLike,
-            handleUnLike,
-            handleLikeComment,
-            handleUnLikeComment,
-            publicImage,
+            showMoreOptions,
             comment,
-            detailPost,
-            comments,
+            publicImage,
+            commentPost,
+            likePost,
+            unLikePost,
+            likeComment,
+            unLikeComment,
+            savedPost,
+            removeSavedPost,
+            getUserById,
+            setTime,
         }
     },
 }

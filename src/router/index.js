@@ -9,6 +9,11 @@ const router = createRouter({
       component: () => import(/* webpackChunkName: "home" */'@/views/client/home.vue'),
     },
     {
+      path: '/explore/people',
+      name: 'Explore-People',
+      component: () => import(/* webpackChunkName: "home" */'@/views/client/explore.vue'),
+    },
+    {
       path: '/p/:id',
       name: 'DetailPost',
       component: () => import(/* webpackChunkName: "detailPost" */'@/views/client/detailPost.vue'),
@@ -70,6 +75,21 @@ const router = createRouter({
         },
       ],
     },
+    {
+      path: "/admin",
+      name: 'AdminHome',
+      component: () => import(/* webpackChunkName: "admin_home" */'@/views/admin/HomeView.vue'),
+      meta: {
+        layout: 'auth',
+      },
+      children: [
+        {
+          path: 'option_reports',
+          name: 'ListOptionReports',
+          component: () => import(/* webpackChunkName: "option_report" */'@/views/admin/ListOptionReportView.vue'),
+        }
+      ]
+    }
   ]
 })
 

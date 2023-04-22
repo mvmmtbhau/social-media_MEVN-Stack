@@ -56,7 +56,9 @@ import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
 import conversationService from "@/services/conversation.service";
+import messageService from "@/services/message.service";
 
+import socket from "@/plugins/socket";
 
 export default {
     setup() {
@@ -71,7 +73,7 @@ export default {
         const fetchChatBox = async (chatBoxId) => {
             try {
                 const response = await conversationService.getConversationById(chatBoxId);
-                if(response.status == 200) {
+                if (response.status == 200) {
                     currentChat.value = response.data;
                     messages.value = response.data.hasMessages;
                 }
@@ -84,47 +86,46 @@ export default {
             fetchChatBox(route.params.id);
         })
 
-        // const sendMessage = async (chatboxId, userOne, userTwo) => {
-        //     if (!message.value) {
-        //         return alert("Vui lòng nhập ký tự");
-        //     }
+        const sendMessage = async (chatboxId, userOne, userTwo) => {
+            if (!message.value) {
+                return alert("Vui lòng nhập ký tự");
+            }
 
-        //     const [receiver] = [
-        //         userOne,
-        //         userTwo,
-        //     ].filter(user =>
-        //         user._id !== store.state.auth.user._id)
+            const [receiver] = [
+                userOne,
+                userTwo,
+            ].filter(user =>
+                user._id !== store.state.auth.user._id)
 
-        //     const data = {
-        //         conversationId: chatboxId,
-        //         message: message.value,
-        //         sender: store.state.auth.user._id,
-        //     };
+            const data = {
+                conversationId: chatboxId,
+                message: message.value,
+                sender: store.state.auth.user._id,
+            };
 
-        //     socket.emit("sendMessage", {
-        //         ...data,
-        //         receiver: receiver._id,
-        //     });
+            socket.emit("sendMessage", {
+                ...data,
+                receiver: receiver._id,
+            });
 
-        //     try {
-        //         const response = await messageService.sendMessage(data);
-        //         if (response.status == 201) {
+            try {
+                const response = await messageService.sendMessage(data);
+                if (response.status == 201) {
 
-        //             messages.value = [...messages.value, response.data];
-        //             message.value = '';
-        //         }
-        //     } catch (err) {
-        //         console.log(err);
-        //     }
-        // }
+                    messages.value = [...messages.value, response.data];
+                    message.value = '';
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
 
-        // onMounted(() => {
-        //     socket?.on("getMessage", async (message) => {
-        //         messages.value = [...messages.value, message];
-        //     });
-        // })
+        socket?.on("getMessage", async (message) => {
+            messages.value = [...messages.value, message];
+        });
 
         return {
+            sendMessage,
             currentChat,
             message,
             messages,

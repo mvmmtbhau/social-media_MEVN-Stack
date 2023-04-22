@@ -11,16 +11,16 @@
 
 <script>
 import sidebarNavigation from '@/components/client/navigation.vue';
-import { useStore } from 'vuex';
-
-import { useRouter } from 'vue-router';
+import { onUnmounted } from 'vue';
 
 export default {
     components: {
         sidebarNavigation,
     },
     setup() {
-        
+        onUnmounted(() => {
+            
+        })
     },
 }
 </script>

@@ -9,9 +9,7 @@ import { onBeforeMount } from 'vue'
 
 export default {
     setup() {
-        onBeforeMount(() => {
-            
-        });
+        
     }
 }
 </script>

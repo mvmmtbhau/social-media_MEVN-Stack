@@ -4,30 +4,26 @@
             <ListChat class="w-[35%] border-top-1 border-left-1 border-right-1 border-bottom-1" />
             <!-- <ChatBox /> -->
             <div class="w-[65%] border-top-1 border-right-1 border-bottom-1">
-                <div v-if="false" class="flex h-full flex-col gap-2 items-center justify-center">
+                <div v-if="!true" class="flex h-full flex-col gap-2 items-center justify-center">
                     <span class="text-2xl">Tin nhắn của bạn</span>
                     <span class="text-gray-400 text-md">Gửi ảnh và tin nhắn riêng tư cho bạn bè</span>
                     <button type="submit"
                         class="bg-cyan-500 text-white p-2 rounded-full mt-2 hover:bg-cyan-600 hover:-translate-y-1">Gửi
                         tin nhắn</button>
                 </div>
-                <router-view></router-view>
+                <router-view :key="this.$route.fullPath"></router-view>
             </div>
         </div>
     </main>
 </template>
 
 <script>
-import { ref, onMounted, onBeforeMount, watch } from "@vue/runtime-core";
-import socket from "@/plugins/socket";
+import { ref, watch } from "@vue/runtime-core";
 import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
 
 import ListChat from "@/components/client/listChat.vue";
 import ChatBox from "@/components/client/chatbox.vue";
-
-import conversationService from "@/services/conversation.service";
-import messageService from "@/services/message.service";
 
 export default {
     components: {
@@ -40,14 +36,7 @@ export default {
         const route = useRoute();
         const router = useRouter();
 
-        const pathName = ref(location.pathname);
-
-        watch(pathName, (newValue) => {
-            console.log(pathName);
-        })
-
         return {
-            pathName,
         }
     },
 }

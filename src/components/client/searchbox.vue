@@ -5,7 +5,7 @@
             <span class="text-2xl px-6 py-8 font-bold">Tìm kiếm</span>
             <div class="relative bg-gray-100 border-2 w-[90%] mx-auto pl-3 py-2 rounded-md">
                 <input type="text" v-model="searchText" class="w-full" placeholder="Tìm kiếm">
-                <span class="absolute right-4 cursor-pointer">Xóa</span>
+                <span @click="searchText = ''" class="absolute right-4 cursor-pointer">Xóa</span>
             </div>
         </div>
         <div v-if="searchResult" class="flex flex-col h-[80%] overflow-y-scroll">
