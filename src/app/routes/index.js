@@ -8,6 +8,8 @@ const conversationRoute = require('./conversation.route');
 const messageRoute = require('./message.route');
 const searchRoute = require('./search.route');
 const notificationRoute = require('./notification.route');
+const optionReportRoute = require('./optionReport.route');
+const reportRoute = require('./report.route');
 
 function route(app) {
     app.use('/api/posts', postRoute);
@@ -20,6 +22,8 @@ function route(app) {
     app.use('/api/message', messageRoute);
     app.use('/api/search', searchRoute);
     app.use('/api/notification', notificationRoute);
+    app.use('/api/option_report', optionReportRoute);
+    app.use('/api/report', reportRoute);
 };
 
 module.exports = route;

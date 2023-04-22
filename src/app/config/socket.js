@@ -12,8 +12,13 @@ const createSocketIO = (httpServer) => {
     let users = [];
 
     const addUser = (userId, socketId) => {
-        !users.some((user) => user.userId === userId) &&
-            users.push({ userId, socketId });
+            if(users.some((user,index) => user.userId === userId)) 
+            {
+              users =   users.filter(user => user.userId != userId);
+                users.push({ userId, socketId });
+            }else{
+                users.push({ userId, socketId });
+            }
     };
 
     const removeUser = (socketId) => {
@@ -21,7 +26,7 @@ const createSocketIO = (httpServer) => {
     };
 
     const getUser = (userId) => {
-        const user = users.find((user) => user.userId === userId);
+        const user = users.reverse().find((user) => user.userId === userId);
         return user;
     };
 
@@ -30,19 +35,18 @@ const createSocketIO = (httpServer) => {
             if (userId) {
                 addUser(userId, socket.id);
             }
-            
-            console.log("a user connected", users);
+
             io.emit("getUsers", users);
         });
 
         socket.on("sendMessage", async (data) => {
             const user = await getUser(data.receiver);
-            console.log(user);
+
             const message = {
                 message: data.message,
                 sender: data.sender
             }
-            console.log(message);
+            
             if (user && user.socketId) {
                 io.to(user?.socketId).emit("getMessage", message);
             }
@@ -73,6 +77,7 @@ const createSocketIO = (httpServer) => {
         });
 
         socket.on("disconnected", () => {
+            console.log({socket});
             socket.broadcast.emit("userDisconnected", socket.id);
         });
 

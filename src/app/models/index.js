@@ -9,4 +9,6 @@ module.exports = {
     'Follow': require('./follow.model'),
     'Search': require('./search.model'),
     'Notification': require('./notification.model'),
+    'OptionReport': require('./option_report.model'),
+    'Report': require('./report.model'),
 }

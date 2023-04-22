@@ -98,8 +98,7 @@ class AuthService {
                         path: 'fromUser',
                         select: '-userName -password',
                     }
-                })
-                .populate('savedPosts');
+                });
 
             return res.status(200).send(user);
         } catch (err) {
@@ -248,6 +247,42 @@ class AuthService {
 
         } catch (err) {
             console.log(err);
+            return res.status(500).send(err);
+        }
+    }
+
+    async getAll(req, res, next) {
+        try {
+            const userId = req.params.id;
+
+            const user = await User.findById(userId).populate({
+                path: 'follows',
+                populate: {
+                    path: 'followUser',
+                    select: '-uesrName -password'
+                }
+            });
+
+            const newArr = [];
+            user.follows.forEach(user => {
+                newArr.push(user.followUser._id);
+            });
+
+            const users = await User.find({
+                _id: {
+                    $nin: newArr,
+                    $ne: userId,
+                }
+            }).populate({
+                path: 'follows',
+                populate: {
+                    path: 'followUser',
+                    select: '-userName -password',
+                }
+            });
+
+            return res.status(200).send(users);
+        } catch (err) {
             return res.status(500).send(err);
         }
     }

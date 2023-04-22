@@ -55,4 +55,4 @@ class CommentService {
     }
 }
 
-module.exports = new CommentService;
+module.exports = new CommentService;  

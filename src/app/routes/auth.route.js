@@ -12,7 +12,7 @@ router.post('/update/:id', upload.array('avatar', 1), authController.updateAccou
 router.post('/change/password', authController.changePassword);
 router.post('/change/privateState/:id', authController.changePrivateState);
 
-router.get('/', authController.getAll);
+router.get('/:id', authController.getAll);
 router.get('/profile/:id', authController.getUserById);
 
 module.exports = router;

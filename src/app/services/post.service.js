@@ -122,7 +122,7 @@ class MessageService {
                 },
             );
 
-            return res.status(201).send(post);
+            return res.status(200).send(post);
         } catch (err) {
             console.log(err);
             return res.status(500).send(err);

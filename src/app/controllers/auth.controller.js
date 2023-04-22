@@ -3,16 +3,7 @@ const ApiError = require('../api-error');
 
 class AuthController {
     async getAll(req, res, next) {
-        let documents = []
-        try {
-            documents = await authService.getAllUser({})
-        } catch (err) {
-            console.log(err);
-            return next(
-                new ApiError(500, err)
-            )
-        };
-        return res.send(documents);
+        return authService.getAll(req, res, next);
     }
 
     async getUserById(req, res, next){
