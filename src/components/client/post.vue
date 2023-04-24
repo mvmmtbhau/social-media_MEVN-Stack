@@ -3,9 +3,9 @@
         <div class="post mb-5 border-2 px-2 py-2 shadow-xl" v-for="(post, index) in posts" :key="index">
             <div class="post-top relative flex items-center gap-2 text-sm py-4 px-2">
                 <router-link v-if="post.owner?._id" :to="{
-                    name: 'User',
-                    params: { id: post.owner?._id }
-                }" class="flex items-center gap-2">
+                        name: 'User',
+                        params: { id: post.owner?._id }
+                    }" class="flex items-center gap-2">
                     <img v-if="post.owner.avatar?.filename" :src="publicImage + post.owner.avatar?.filename"
                         class="w-8 h-8 rounded-full cursor-pointer">
                     <img v-else src="../../assets/images/no-avatar.jfif" class="w-8 h-8 rounded-full cursor-pointer">
@@ -17,8 +17,7 @@
                         {{ setTime(post.createdAt) }}
                     </span>
                 </div>
-                <font-awesome-icon v-if="post.owner?._id == this.$store.state.auth.user?._id" @click="deletePost(post?._id)"
-                    icon="fa-solid fa-ellipsis"
+                <font-awesome-icon @click="showActionModal(post)" icon="fa-solid fa-ellipsis"
                     class="absolute right-2 cursor-pointer text-xl hover:text-gray-400" />
             </div>
             <div class="post-content">
@@ -43,7 +42,7 @@
                         class="cursor-pointer" />
 
                     <font-awesome-icon icon="fa-regular fa-comment" class="cursor-pointer"
-                        @click="showDetailPost(post?._id)" />
+                        @click="arriveToPost(post._id)" />
                     <font-awesome-icon v-if="this.$store.state.auth.user?.savedPosts && this.$store.state.auth.user?.savedPosts.length &&
                         this.$store.state.auth.user?.savedPosts.some(id => id == post?._id)"
                         icon="fa-solid fa-bookmark" class="absolute right-2 cursor-pointer"
@@ -63,6 +62,7 @@
                 </div>
             </div>
         </div>
+        <action-modal />
     </section>
 </template>
 
@@ -79,8 +79,13 @@ import postService from "@/services/post.service";
 import usePost from "@/uses/usePost";
 import useUser from "@/uses/useUser";
 
+import actionModal from "@/components/client/actionModal.vue";
+
 export default {
     name: "Post",
+    components: {
+        actionModal,
+    },
     setup() {
         const store = useStore();
         const router = useRouter();
@@ -97,6 +102,7 @@ export default {
             savedPost,
             removeSavedPost,
             setTime,
+            arriveToPost,
         } = usePost();
 
         onBeforeMount(() => {
@@ -104,14 +110,6 @@ export default {
             getAllPosts();
         })
 
-        const showDetailPost = async (postId) => {
-            router.push({
-                name: 'DetailPost',
-                params: {
-                    id: postId
-                }
-            })
-        }
 
         const deletePost = async (postId) => {
             console.log(postId);
@@ -127,14 +125,19 @@ export default {
             }
         }
 
+        const showActionModal = async (post) => {
+            store.dispatch('post/handleSetPostAction', post);
+            store.dispatch('modal/handleShowActionModal', true);
+        }
+
         socket?.on("getPost", data => {
             console.log(data);
             posts.value = [...posts.value, data]
         })
 
         return {
-            showDetailPost,
             deletePost,
+            showActionModal,
             setTime,
             likePostInPosts,
             unLikePostInPosts,
@@ -142,6 +145,7 @@ export default {
             removeSavedPost,
             posts,
             publicImage,
+            arriveToPost,
         }
     },
 }

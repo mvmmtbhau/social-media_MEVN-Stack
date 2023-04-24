@@ -5,8 +5,8 @@ class PostService {
         this.api = instance;
     }
 
-    async getAll() {
-        return (await this.api.get('/posts'));
+    async getAll(userId) {
+        return (await this.api.get(`/posts/${userId}`));
     }
 
     async getPostById(postId) {

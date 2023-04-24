@@ -2,6 +2,8 @@
 // shape: [{ id, quantity }]
 const state = () => ({
     post: null,
+    postAction: null,
+    commentAction: null,
     comments: null,
     commentLikes: null,
 });
@@ -14,6 +16,12 @@ const getters = {
 const actions = {
     handleSetDetailPost({ commit }, post) {
         commit("setDetailPost", post);
+    },
+    handleSetPostAction({ commit }, postAction) {
+        commit("setPostAction", postAction);
+    },
+    handleSetCommentAction({ commit }, commentAction) {
+        commit("setCommentAction", commentAction);
     },
     handleSetComments({ commit }, comments) {
         commit("setComments", comments);
@@ -36,6 +44,12 @@ const actions = {
 const mutations = {
     setDetailPost(state, payload) {
         state.post = payload;
+    },
+    setPostAction(state, payload) {
+        state.postAction = payload;
+    },
+    setCommentAction(state, payload) {
+        state.commentAction = payload;
     },
     setComments(state, payload) {
         state.comments = payload;

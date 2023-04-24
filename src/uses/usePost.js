@@ -5,11 +5,13 @@ import likeCommentService from "@/services/likeComment.service";
 
 import { ref } from "vue";
 import { useStore } from 'vuex';
+import { useRouter } from "vue-router";
 
 import useUser from '@/uses/useUser';
 
 export default function () {
     const store = useStore();
+    const router = useRouter();
     const { fetchCurrentUser } = useUser();
 
     const posts = ref();
@@ -17,14 +19,9 @@ export default function () {
 
     const getAllPosts = async () => {
         try {
-            const response = await postService.getAll();
+            const response = await postService.getAll(store.state.auth.user?._id);
             if (response.status === 200) {
-                posts.value = response.data.filter(
-                    post =>
-                        !post.owner.private
-                        || post.owner._id == store.state.auth.user._id
-                        || store.state.auth.user.follows.some(follow => follow.followUser?._id == post.owner._id && follow.state == true)
-                );
+                posts.value = response.data;
             }
 
         } catch (err) {
@@ -246,6 +243,15 @@ export default function () {
         }
     }
 
+    const arriveToPost = (postId) => {
+        router.push({
+            name: 'DetailPost',
+            params: {
+                id: postId
+            }
+        })
+    }
+
     return {
         getAllPosts,
         likePostInPosts,
@@ -259,6 +265,7 @@ export default function () {
         savedPost,
         removeSavedPost,
         setTime,
+        arriveToPost,
         posts
     }
 }

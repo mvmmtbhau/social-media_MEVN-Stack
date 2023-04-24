@@ -1,6 +1,6 @@
 import instance from './api.service';
 
-class SearchService {
+class OptionReportService {
     constructor() {
         this.api = instance;
     }
@@ -20,6 +20,10 @@ class SearchService {
     async delete(optionId) {
         return (await this.api.delete(`/option_report/delete/${optionId}`));
     }
+
+    async getOptions() {
+        return (await this.api.get('/option_report/all'));
+    }
 }
 
-export default new SearchService();
+export default new OptionReportService();

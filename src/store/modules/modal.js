@@ -5,6 +5,7 @@ const state = () => ({
     showDetailPostModal: false,
     showSearchBox: false,
     showNotifications: false,
+    showActionModal: false,
 });
 
 // getters
@@ -24,6 +25,9 @@ const actions = {
     handleShowNotifications({ commit }, showNotifications) {
         commit("setShowNotifications", showNotifications);
     },
+    handleShowActionModal({ commit }, showActionModal) {
+        commit("setShowActionModal", showActionModal);
+    },
 };
 
 // mutations
@@ -39,6 +43,9 @@ const mutations = {
     },
     setShowNotifications(state, payload) {
         state.showNotifications = payload;
+    },
+    setShowActionModal(state, payload) {
+        state.showActionModal = payload;
     },
 };
 
