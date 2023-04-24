@@ -13,11 +13,11 @@ const ReportSchema = new Schema({
         type: mongoose.Types.ObjectId,
         ref: 'OptionReport',
     },
-    postId: {
+    post: {
         type: mongoose.Types.ObjectId,
         ref: 'Post',
     },
-    commentId: {
+    comment: {
         type: mongoose.Types.ObjectId,
         ref: 'Comment',
     },

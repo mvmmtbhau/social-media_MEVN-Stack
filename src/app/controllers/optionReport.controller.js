@@ -119,6 +119,16 @@ class OptionReportController {
             return res.status(500).json(err);
         }
     }
+
+    async getOptions(req, res, next) {
+        try {
+            const options = await optionService.find({});
+
+            return res.status(200).json(options);
+        } catch (err) {
+            return res.status(500).json(err);
+        }
+    }
 }
 
 module.exports = new OptionReportController;

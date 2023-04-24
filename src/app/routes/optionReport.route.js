@@ -9,6 +9,7 @@ router.patch('/update/:id', optionReportController.updateOption);
 
 router.delete('/delete/:id', optionReportController.deleteOption);
 
+router.get('/all', optionReportController.getOptions);
 router.get('/', optionReportController.getAll);
 
 

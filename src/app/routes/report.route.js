@@ -1,15 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const optionReportController = require('../controllers/optionReport.controller');
+const reportController = require('../controllers/report.controller');
 
-router.post('/add', optionReportController.addNew);
-
-router.patch('/update/:id', optionReportController.updateOption);
-
-router.delete('/delete/:id', optionReportController.deleteOption);
-
-router.get('/', optionReportController.getAll);
+router.post('/add', reportController.addNew);
 
 
 module.exports = router;

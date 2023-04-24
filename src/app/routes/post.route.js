@@ -11,7 +11,7 @@ router.post('/removeSavedPost', postController.userRemoveSavedPost);
 
 router.delete('/:id', postController.removePostById);
 
-router.get('/',[isAuthentication], postController.getAllPost);
+router.get('/:userId',[isAuthentication], postController.getAllPost);
 router.get('/detail/:id', postController.getPostById);
 
 

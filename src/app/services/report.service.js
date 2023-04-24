@@ -1,28 +1,31 @@
-const { OptionReport } = require('../models/');
+const { Report } = require('../models/');
 
-class OptionReportService {
-    async create(text) {
-        const option = new OptionReport({
-            text: text
+class ReportService {
+    async create(data) {
+        const report = new Report({
+            fromUser: data.fromUser,
+            optionReport: data.optionReport,
+            post: data.post ? data.post : null,
+            comment: data.comment ? data.comment : null,
         });
 
-        return await option.save();
+        return await report.save();
     }
 
     async find(filter) {
-        return OptionReport.find(filter);
+        return Report.find(filter);
     }
 
     async findOne(filter) {
-        return await OptionReport.findOne(filter);
+        return await Report.findOne(filter);
     }
 
     async findLimit(filter, numLimit, skipNum, sortBy) {
-        return await OptionReport.find(filter).sort(sortBy).limit(numLimit).skip(skipNum);
+        return await Report.find(filter).sort(sortBy).limit(numLimit).skip(skipNum);
     }
 
     async update(optionId, data) {
-        const result = await OptionReport.findByIdAndUpdate(
+        const result = await Report.findByIdAndUpdate(
             {
                 _id: optionId,
             },
@@ -35,7 +38,7 @@ class OptionReportService {
     }
 
     async delete(optionId) {
-        const result = await OptionReport.findByIdAndDelete(
+        const result = await Report.findByIdAndDelete(
             {
                 _id: optionId,
             },
@@ -45,4 +48,4 @@ class OptionReportService {
     }
 }
 
-module.exports = new OptionReportService;
+module.exports = new ReportService;

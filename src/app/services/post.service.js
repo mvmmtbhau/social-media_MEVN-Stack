@@ -1,4 +1,4 @@
-const { Post, User, Comment } = require('../models/');
+const { Post, User, Comment, Report } = require('../models/');
 const mongoose = require('mongoose');
 
 class MessageService {
@@ -31,9 +31,35 @@ class MessageService {
 
     async getAll(req, res, next) {
         try {
-            return res.status(200).send(
-                await Post.find({}).populate('owner', '-userName -password -follows -hasFollowers').populate('likes')
-            );
+            const userId = req.params.userId;
+            const postIdArr = [];
+
+            const user = await User.findOne({
+                _id: userId
+            }).populate('follows');
+
+            const report = await Report.find({
+                fromUser: userId,
+            })
+
+            report.forEach(report => {
+                report.post ? postIdArr.push(report.post) : ''
+            })
+
+            const posts = await Post.find({
+                _id: {
+                    $nin: postIdArr,
+                }
+            }).populate('owner', '-userName -password');
+
+            posts.filter(
+                post =>
+                    !post.owner.private
+                    || post.owner._id == userId
+                    || user.follows.some(follow => follow.followUser == post.owner._id && follow.state == true)
+            )
+
+            return res.status(200).json(posts);
         } catch (err) {
             return res.status(500).send(err);
         }
@@ -83,13 +109,13 @@ class MessageService {
 
             const post = await Post.findById(postId);
 
-            if(!post) return res.status(404).send("Post not found");
-            
+            if (!post) return res.status(404).send("Post not found");
+
 
             const updateUser = await User.findByIdAndUpdate(
                 userId,
                 {
-                    $push: 
+                    $push:
                     {
                         savedPosts: post._id
                     }
@@ -110,12 +136,12 @@ class MessageService {
 
             const post = await Post.findById(postId);
 
-            if(!post) return res.status(404).send("Post not found");
-            
+            if (!post) return res.status(404).send("Post not found");
+
             const updateUser = await User.findByIdAndUpdate(
                 userId,
                 {
-                    $pullAll: 
+                    $pullAll:
                     {
                         savedPosts: [post._id],
                     },
