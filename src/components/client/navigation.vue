@@ -117,6 +117,7 @@
             <Notifications id="notifications" :class="{ 'hidden': !this.$store.state.modal?.showNotifications }" />
         </aside>
         <create-post />
+        <action-modal />
     </section>
 </template>
 
@@ -124,6 +125,7 @@
 import createPost from '@/components/client/createPost.vue';
 import SearchBox from "@/components/client/searchbox.vue";
 import Notifications from "@/components/client/notifications.vue";
+import actionModal from "@/components/client/actionModal.vue";
 
 import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
@@ -138,6 +140,7 @@ export default {
         createPost,
         SearchBox,
         Notifications,
+        actionModal,
     },
     setup() {
         const store = useStore();
@@ -149,10 +152,6 @@ export default {
         } = useUser();
 
         const isShowMore = ref(false);
-
-        watch(() => route.name, () => {
-            console.log(`Current route: ${route.name}`);
-        })
 
         // Show thông báo
         document.addEventListener('click', (e) => {

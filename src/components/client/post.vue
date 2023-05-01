@@ -62,7 +62,6 @@
                 </div>
             </div>
         </div>
-        <action-modal />
     </section>
 </template>
 
@@ -74,18 +73,12 @@ import socket from "@/plugins/socket";
 
 import { publicImage } from "@/constants/";
 
-import postService from "@/services/post.service";
-
 import usePost from "@/uses/usePost";
 import useUser from "@/uses/useUser";
-
-import actionModal from "@/components/client/actionModal.vue";
+import { watch } from "vue";
 
 export default {
     name: "Post",
-    components: {
-        actionModal,
-    },
     setup() {
         const store = useStore();
         const router = useRouter();
@@ -107,23 +100,12 @@ export default {
 
         onBeforeMount(() => {
             getUserById(store.state.auth.user._id);
-            getAllPosts();
+            getAllPosts(store.state.auth.user?._id);
         })
 
-
-        const deletePost = async (postId) => {
-            console.log(postId);
-            try {
-                const response = await postService.deletePost(postId);
-                if (response.status == 200 || response.status == 204) {
-                    posts.value = posts.value.filter(post => post._id !== response.data.deletedPost._id);
-                    store.dispatch("auth/handleSetUser", response.data.updateUser);
-                    console.log("Xóa bài viết thành công");
-                }
-            } catch (err) {
-                console.log(err);
-            }
-        }
+        watch(posts, () => {
+            
+        })
 
         const showActionModal = async (post) => {
             store.dispatch('post/handleSetPostAction', post);
@@ -136,7 +118,6 @@ export default {
         })
 
         return {
-            deletePost,
             showActionModal,
             setTime,
             likePostInPosts,

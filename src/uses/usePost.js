@@ -3,6 +3,8 @@ import commentService from "@/services/comment.service";
 import likeService from "@/services/like.service";
 import likeCommentService from "@/services/likeComment.service";
 
+import socket from "@/plugins/socket";
+
 import { ref } from "vue";
 import { useStore } from 'vuex';
 import { useRouter } from "vue-router";
@@ -14,12 +16,12 @@ export default function () {
     const router = useRouter();
     const { fetchCurrentUser } = useUser();
 
-    const posts = ref();
-    const comments = ref();
+    var posts = ref();
+    var comments = ref();
 
-    const getAllPosts = async () => {
+    const getAllPosts = async (userId) => {
         try {
-            const response = await postService.getAll(store.state.auth.user?._id);
+            const response = await postService.getAll(userId);
             if (response.status === 200) {
                 posts.value = response.data;
             }
@@ -68,14 +70,24 @@ export default function () {
         }
     }
 
-    const getPostById = async (postId) => {
+    const getPostById = async (postId, userId) => {
         try {
-            const response = await postService.getPostById(postId);
-            const comments = await commentService.getCommentsByPostId(postId);
-
-            if (response.status == 200 && comments.status == 200) {
+            const response = await postService.getPostById(postId, userId);
+            if (response.status == 200) {
                 store.dispatch('post/handleSetDetailPost', response.data);
-                store.dispatch('post/handleSetComments', comments.data);
+                return response;
+            }
+        } catch (err) {
+            return err.response;
+        }
+    }
+    
+    const getCommentsByPostId = async (postId, userId) => {
+        try {
+            const response = await commentService.getCommentsByPostId(postId, userId);
+            if(response.status == 200) {
+                store.dispatch('post/handleSetComments', response.data);
+                return response;
             }
         } catch (err) {
             console.log(err);
@@ -252,6 +264,31 @@ export default function () {
         })
     }
 
+    const deletePost = async (postId) => {
+        try {
+            const response = await postService.deletePost(postId);
+            await getAllPosts(store.state.auth.user?._id);
+
+            return response;
+        } catch (err) {
+            return err.response;
+        }
+    }
+
+    const deleteComment = async (commentId) => {
+        try {
+            const response = await commentService.deleteComment(commentId);
+            if(response.status == 200) {
+                console.log(response.data);
+                await getCommentsByPostId(store.state.post.post?._id, store.state.auth.user?._id);
+            }
+        } catch (err) {
+            if(err.response.status == 404) {
+                console.log(err.response.data);
+            }
+        }
+    }
+
     return {
         getAllPosts,
         likePostInPosts,
@@ -266,6 +303,9 @@ export default function () {
         removeSavedPost,
         setTime,
         arriveToPost,
+        getCommentsByPostId,
+        deletePost,
+        deleteComment,
         posts
     }
 }

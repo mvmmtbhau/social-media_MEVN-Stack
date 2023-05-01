@@ -9,8 +9,12 @@ class CommentService {
         return (await this.api.post('/comments',data));
     }
 
-    async getCommentsByPostId(postId) {
-        return (await this.api.get(`/comments/${postId}`));
+    async getCommentsByPostId(postId, userId) {
+        return (await this.api.get(`/comments/${postId}&${userId}`));
+    }
+
+    async deleteComment(commentId) {
+        return (await this.api.delete(`/comments/delete/${commentId}`));
     }
 }
 

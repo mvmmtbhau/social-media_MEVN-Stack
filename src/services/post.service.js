@@ -9,8 +9,8 @@ class PostService {
         return (await this.api.get(`/posts/${userId}`));
     }
 
-    async getPostById(postId) {
-        return (await this.api.get(`/posts/detail/${postId}`));
+    async getPostById(postId, userId) {
+        return (await this.api.get(`/posts/detail/${postId}&${userId}`));
     }
 
     async createPost(data) {
@@ -27,7 +27,7 @@ class PostService {
     }
 
     async deletePost(postId) {
-        return (await this.api.delete(`/posts/${postId}`));
+        return (await this.api.delete(`/posts/delete/${postId}`));
     }
 
     async savedPost(data) {
