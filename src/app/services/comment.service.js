@@ -1,4 +1,4 @@
-const { Comment, Post, Notification } = require('../models/');
+const { Comment, Post, Notification, Report } = require('../models/');
 const mongoose = require('mongoose');
 
 class CommentService {
@@ -45,10 +45,43 @@ class CommentService {
     }
 
     async getCommentsByPostId(req, res) {
-        const postId = req.params.postId;
         try {
-            const result = await Comment.find({ belongToPost: postId }).populate('owner').populate('likes');
-            return res.status(200).send(result);
+            const postId = req.params.postId;
+            const userId = req.params.userId;
+
+            const reports = await Report.find({
+                fromUser: userId,
+                comment: {
+                    $ne: null,
+                }
+            })
+
+            const commentIdArr = [];
+
+            reports.forEach(report => {
+                commentIdArr.push(report.comment);
+            });
+
+            const comments = await Comment.find({
+                belongToPost: postId,
+                _id: {
+                    $nin: commentIdArr,
+                }
+            }).populate('owner').populate('likes');
+
+            return res.status(200).json(comments);
+        } catch (err) {
+            return res.status(500).json(err);
+        }
+    }
+
+    async deleteById(req, res, next) {
+        try {
+            const commentDeleted = await Comment.findByIdAndDelete(req.params.id);
+            
+            if(!commentDeleted) return res.status(404).json('Không tìm thấy comment');
+
+            return res.status(200).json('Xóa thành công');
         } catch (err) {
             return res.status(500).json(err);
         }

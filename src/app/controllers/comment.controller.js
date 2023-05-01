@@ -24,6 +24,14 @@ class CommentController {
         }
     }
 
+    async deleteComment(req, res, next) {
+        try {
+            const response = await commentService.deleteById(req, res, next);
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+    }
 }
 
 module.exports = new CommentController;

@@ -40,17 +40,20 @@ class MessageService {
 
             const report = await Report.find({
                 fromUser: userId,
-            })
+                post: {
+                    $ne: null
+                }
+            });
 
             report.forEach(report => {
-                report.post ? postIdArr.push(report.post) : ''
+                postIdArr.push(report.post)
             })
 
             const posts = await Post.find({
                 _id: {
                     $nin: postIdArr,
                 }
-            }).populate('owner', '-userName -password');
+            }).populate('owner', '-userName -password').populate('likes');
 
             posts.filter(
                 post =>
@@ -67,17 +70,27 @@ class MessageService {
 
     async getById(req, res, next) {
         try {
-            const postId = req.params.id;
+            const postId = req.params.postId;
+            const userId = req.params.userId;
+
+            const report = await Report.findOne({
+                fromUser: userId,
+                post: postId
+            });
+
+            if(report) return res.status(404).json(report);
+
             const post = await Post.findById(postId).populate('owner', '-userName -password -follows -hasFollowers').populate('likes');
-            return res.status(200).send(post);
+            return res.status(200).json(post);
         } catch (err) {
-            return res.status(500).send(err);
+            return res.status(500).json(err);
         }
     }
 
     async deleteById(req, res, next) {
         try {
             const postId = req.params.id;
+
             const deletedPost = await Post.findByIdAndDelete(postId);
             if (deletedPost) {
                 const updateUser = await User.findByIdAndUpdate(
