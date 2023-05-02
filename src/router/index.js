@@ -76,7 +76,7 @@ const router = createRouter({
       ],
     },
     {
-      path: "/admin",
+      path: "/haadminha",
       name: 'AdminHome',
       component: () => import(/* webpackChunkName: "admin_home" */'@/views/admin/HomeView.vue'),
       meta: {
@@ -87,6 +87,16 @@ const router = createRouter({
           path: 'option_reports',
           name: 'ListOptionReports',
           component: () => import(/* webpackChunkName: "option_report" */'@/views/admin/ListOptionReportView.vue'),
+        },
+        {
+          path: 'report_post',
+          name: 'ListReportPost',
+          component: () => import(/* webpackChunkName: "option_report" */'@/views/admin/ListReportPostView.vue'),
+        },
+        {
+          path: 'report_comment',
+          name: 'ListReportComment',
+          component: () => import(/* webpackChunkName: "option_report" */'@/views/admin/ListReportCommentView.vue'),
         }
       ]
     }

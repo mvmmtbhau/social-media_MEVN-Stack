@@ -5,8 +5,12 @@ class NotificationService {
         this.api = instance;
     }
 
-    async getNotificationsByUserId(userId) {
-        return (await this.api.get(`/notification/get/${userId}`))
+    async getByUserId(userId) {
+        return (await this.api.get(`/notification/${userId}`))
+    }
+    
+    async update(userId) {
+        return (await this.api.post(`/notification/update/${userId}`))
     }
 }
 

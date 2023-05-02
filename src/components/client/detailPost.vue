@@ -79,7 +79,7 @@
                                                 comment?.likes.some(like => like.owner == this.$store.state.auth.user._id)"
                                             icon="fa-solid fa-heart"
                                             class="absolute top-0 right-0 cursor-pointer hover:scale-105 text-red"
-                                            @click="unLikeComment(comment._id, this.$store.state.auth.user._id, index)" />
+                                            @click="unLikeComment(comment._id, this.$store.state.auth.user._id, this.$store.state.post.post?._id)" />
                                         <font-awesome-icon v-else icon="fa-regular fa-heart"
                                             class="absolute top-0 right-0 cursor-pointer hover:scale-105"
                                             @click="likeComment(comment._id, this.$store.state.auth.user._id, index)" />
@@ -177,6 +177,8 @@ import { useRouter, useRoute } from 'vue-router';
 import usePost from "@/uses/usePost";
 import useUser from "@/uses/useUser";
 
+import socket from "@/plugins/socket";
+
 export default {
     name: 'detailPost',
     setup() {
@@ -227,6 +229,14 @@ export default {
             : store.dispatch('post/handleSetCommentAction', data);
             store.dispatch('modal/handleShowActionModal', true);
         }
+
+        socket?.on('deleteComment', async () => {
+            await getCommentsByPostId(postId.value, store.state.auth.user?._id);
+        })
+
+        socket?.on('reportComment', async () => {
+            await getCommentsByPostId(postId.value, store.state.auth.user?._id);
+        })
 
         return {
             closeModal,

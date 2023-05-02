@@ -1,13 +1,13 @@
 <template>
-    <section class="h-full w-[28rem] bg-white shadow-[10px_0_10px_-5px_rgba(0,0,0,0.3)]
-                                             border-l-2 -right-[28rem] flex flex-col">
+    <section class="h-full w-[28rem] bg-white 
+    shadow-[10px_0_10px_-5px_rgba(0,0,0,0.3)] border-l-2 -right-[28rem] flex flex-col">
         <div class="flex flex-col border-b-2 border-gray-200 ">
             <span class="text-2xl px-6 py-4 font-bold">Thông báo</span>
         </div>
         <div class="overflow-y-scroll h-[91%] flex flex-col mt-4">
-            <div v-if="this.$store.state.auth?.notifications && this.$store.state.auth?.notifications.length">
+            <div v-if="this.$store.state.auth.notifications">
                 <div class="w-full flex items-center gap-3 hover:bg-gray-100 py-3 cursor-pointer"
-                    v-for="noti in this.$store.state.auth?.notifications" :key="noti"
+                    v-for="noti in this.$store.state.auth.notifications" :key="noti"
                     @click="noti.postId ? arriveToPost(noti.postId) : arriveToUser(noti.fromUser._id)">
                     <div class="w-20">
                         <img @click.stop="arriveToUser(noti.fromUser._id)" v-if="noti.fromUser?.avatar"
@@ -35,68 +35,60 @@
 import { publicImage } from "@/constants/";
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { onMounted } from "vue";
+import { onBeforeMount, onMounted, ref } from "vue";
 
 import socket from "@/plugins/socket";
-import authService from "@/services/auth.service";
-import notificationService from "@/services/notification.service";
+
+import useNoti from "@/uses/useNoti";
+import useUser from "@/uses/useNoti";
+import usePost from "@/uses/useNoti";
 
 export default {
     setup() {
         const store = useStore();
         const router = useRouter();
 
-        const arriveToUser = (userId) => {
-            router.push({
-                name: 'User',
-                params: { id: userId }
-            });
-        }
+        const {
+            getNotis,
+        } = useNoti();
 
         const arriveToPost = (postId) => {
             router.push({
                 name: 'DetailPost',
-                params: {
-                    id: postId
-                }
+                params: { id: postId }
             })
         }
 
-        const fetchNoti = async () => {
-            try {
-                const response = await notificationService.getNotificationsByUserId(this.$store.state.auth.user?._id);
-                if (response.status == 200) {
-                    store.dispatch("auth/handleSetNotifications", response.data);
-                }
-            } catch (err) {
-                console.log(err);
-            }
+        const arriveToUser = (userId) => {
+            router.push({
+                name: 'User',
+                params: { id: userId }
+            })
         }
 
-        const fetchUser = async () => {
-            try {
-                const response = await authService.getUserById(this.$store.state.auth.user?._id);
-                if (response.status == 200) {
-                    store.dispatch("auth/handleSetUser", response.data);
-                }
-            } catch (err) {
-                console.log(err);
-            }
-        }
-
-        onMounted(() => {
-            socket?.on("getLike", (data) => {
-                store.dispatch('auth/handleUpdateNotificationsWithNewNoti', data);
-            })
-
-
-            socket?.on('getComment', data => {
-                store.dispatch('auth/handleUpdateNotificationsWithNewNoti', data);
-            })
+        onBeforeMount(() => {
+            getNotis(store.state.auth.user?._id);
         })
+
+        socket?.on("getLikePost", (data) => {
+            getNotis(store.state.auth.user?._id);
+        })
+
+        socket?.on("getLikeComment", (data) => {
+            getNotis(store.state.auth.user?._id);
+        })
+
+        socket?.on('getComment', (data) => {
+            getNotis(store.state.auth.user?._id);
+        })
+
+        socket?.on('likeComment', (data) => {
+            getNotis(store.state.auth.user?._id);
+        })
+
         return {
-            arriveToUser,
             arriveToPost,
+            arriveToUser,
             publicImage,
         }
     },

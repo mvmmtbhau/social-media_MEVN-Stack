@@ -1,6 +1,6 @@
 import instance from './api.service';
 
-class SearchService {
+class ReportService {
     constructor() {
         this.api = instance;
     }
@@ -9,9 +9,17 @@ class SearchService {
         return (await this.api.post(`/report/add/`, data));
     }
 
-    // async getAll(page, per_page, sortBy, searchText) {
-    //     return (await this.api.get(`/option_report?page=${page}&per_page=${per_page}&sort_by=${sortBy}&search_text=${searchText}`));
-    // }
+    async getReportPosts() {
+        return (await this.api.get('/report/posts'));
+    }
+
+    async update(data) {
+        return (await this.api.post('/report/update', data));
+    }
+
+    async getReportComments(page, per_page, sortBy) {
+        return (await this.api.get(`/report/comments?page=${page}&per_page=${per_page}&sort_by=${sortBy}`));
+    }
 
     // async update(optionId, data) {
     //     return (await this.api.patch(`/option_report/update/${optionId}`, data));
@@ -26,4 +34,4 @@ class SearchService {
     // }
 }
 
-export default new SearchService();
+export default new ReportService();

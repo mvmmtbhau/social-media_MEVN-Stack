@@ -36,8 +36,6 @@ export default {
 
         if (store.state.auth.user) {
           getConversations(store.state.auth.user._id);
-          getNotifications(store.state.auth.user._id);
-
 
           socket.emit("addUser", store.state.auth.user?._id);
         }
@@ -61,17 +59,6 @@ export default {
         const response = await conversationService.getConversationsByUserId(userId);
         if (response.status == 200) {
           store.dispatch("auth/handleSetConversations", response.data);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
-    const getNotifications = async (userId) => {
-      try {
-        const response = await notificationService.getNotificationsByUserId(userId);
-        if (response.status == 200) {
-          store.dispatch("auth/handleSetNotifications", response.data);
         }
       } catch (err) {
         console.log(err);

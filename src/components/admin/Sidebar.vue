@@ -17,20 +17,29 @@
                 </div>
                 <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-white" />
             </router-link>
-            <router-link to="/" class="flex items-center justify-between gap-[10px] py-[15px] cursor-pointer">
+            <router-link to="/haadminha/option_reports" class="flex items-center justify-between gap-[10px] py-[15px] cursor-pointer">
                 <div class="flex items-center gap-[10px] text-white">
                     <font-awesome-icon :icon="['fas', 'list']" />
                     <p class="text-[14px] leading-[20px] font-normal">
-                        Danh sách công việc
+                        Danh sách lựa chọn báo cáo
                     </p>
                 </div>
                 <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-white" />
             </router-link>
-            <router-link to="/" class="flex items-center justify-between gap-[10px] py-[15px] cursor-pointer">
+            <router-link to="/haadminha/report_post" class="flex items-center justify-between gap-[10px] py-[15px] cursor-pointer">
                 <div class="flex items-center gap-[10px] text-white">
                     <font-awesome-icon :icon="['fas', 'list']" />
                     <p class="text-[14px] leading-[20px] font-normal">
-                        Danh sách nhân sự
+                        Danh sách báo cáo bài viết
+                    </p>
+                </div>
+                <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-white" />
+            </router-link>
+            <router-link to="/haadminha/report_comment" class="flex items-center justify-between gap-[10px] py-[15px] cursor-pointer">
+                <div class="flex items-center gap-[10px] text-white">
+                    <font-awesome-icon :icon="['fas', 'list']" />
+                    <p class="text-[14px] leading-[20px] font-normal">
+                        Danh sách báo cáo bình luận
                     </p>
                 </div>
                 <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-white" />

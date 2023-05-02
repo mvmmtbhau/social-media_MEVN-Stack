@@ -34,11 +34,11 @@
                 <div class="relative text-2xl flex px-1 py-4 gap-4">
                     <font-awesome-icon v-if="post?.likes && post?.likes.length &&
                         post?.likes.some(like => like.owner === this.$store.state.auth.user?._id)"
-                        @click="unLikePostInPosts(post?._id, this.$store.state.auth.user?._id, index)"
+                        @click="handleUnLike(post?._id, this.$store.state.auth.user?._id, index)"
                         icon="fa-solid fa-heart" class="cursor-pointer text-red " />
 
                     <font-awesome-icon v-else icon="fa-regular fa-heart"
-                        @click="likePostInPosts(post?._id, this.$store.state.auth.user?._id, index)"
+                        @click="handleLike(post?._id, this.$store.state.auth.user?._id, index)"
                         class="cursor-pointer" />
 
                     <font-awesome-icon icon="fa-regular fa-comment" class="cursor-pointer"
@@ -83,12 +83,13 @@ export default {
         const store = useStore();
         const router = useRouter();
 
+        const posts = ref();
+
         const {
             getUserById,
         } = useUser();
 
         const {
-            posts,
             getAllPosts,
             likePostInPosts,
             unLikePostInPosts,
@@ -98,14 +99,40 @@ export default {
             arriveToPost,
         } = usePost();
 
-        onBeforeMount(() => {
+        const fetchPosts = async (userId) => {
+            const response = await getAllPosts(userId);
+            if(response.status == 200) {
+                posts.value = response.data;
+            }
+        }
+
+        onBeforeMount(async() => {
             getUserById(store.state.auth.user._id);
-            getAllPosts(store.state.auth.user?._id);
+            fetchPosts(store.state.auth.user?._id);
         })
 
-        watch(posts, () => {
-            
-        })
+        const handleLike = async (postId, userId, index) => {
+            const response = likePostInPosts(postId, userId);
+            if (response.status == 201) {
+                posts.value[index].likes = [
+                    ...posts.value[index].likes,
+                    response.data.newNoti
+                        ? response.data.newLike
+                        : response.data
+                ];
+
+                if (response.data.newNoti) {
+                    socket?.emit("likePost", response.data.newNoti);
+                }
+            }
+        }
+
+        const handleUnLike = async (postId, userId, index) => {
+            const response = await unLikePostInPosts(postId, userId);
+            if (response.status == 200 || response.status == 204) {
+                posts.value[index].likes = posts.value[index].likes.filter(like => like._id !== response.data._id);
+            }
+        }
 
         const showActionModal = async (post) => {
             store.dispatch('post/handleSetPostAction', post);
@@ -113,12 +140,21 @@ export default {
         }
 
         socket?.on("getPost", data => {
-            console.log(data);
             posts.value = [...posts.value, data]
+        })
+
+        socket?.on('deletePost', () => {
+            fetchPosts(store.state.auth.user?._id);
+        })
+
+        socket?.on('reportPost', () => {
+            fetchPosts(store.state.auth.user?._id);
         })
 
         return {
             showActionModal,
+            handleLike,
+            handleUnLike,
             setTime,
             likePostInPosts,
             unLikePostInPosts,

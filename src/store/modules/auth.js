@@ -22,8 +22,8 @@ const actions = {
     handleSetConversations({ commit }, conversations) {
         commit("setConversations", conversations);
     },
-    handleSetNotifications({ commit }, notifications) {
-        commit("setNotifications", notifications);
+    handleSetNotis({ commit }, notifications) {
+        commit("setNotis", notifications);
     },
     handleSetUserById({ commit }, userById) {
         commit("setUserById", userById);
@@ -81,7 +81,7 @@ const mutations = {
     setConversations(state, payload) {
         state.conversations = payload;
     },
-    setNotifications(state, payload) {
+    setNotis(state, payload) {
         state.notifications = payload;
     },
     setUserById(state, payload) {

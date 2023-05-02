@@ -21,11 +21,7 @@ export default function () {
 
     const getAllPosts = async (userId) => {
         try {
-            const response = await postService.getAll(userId);
-            if (response.status === 200) {
-                posts.value = response.data;
-            }
-
+            return await postService.getAll(userId);
         } catch (err) {
             if (err.response.status === 401) {
                 router.push({ name: "Login" });
@@ -33,38 +29,22 @@ export default function () {
         }
     }
 
-    const likePostInPosts = async (postId, userId, index) => {
+    const likePostInPosts = async (postId, userId) => {
         try {
             const data = {
                 belongToPost: postId,
                 owner: userId,
             }
 
-            const response = await likeService.likePost(data);
-            if (response.status == 201) {
-                posts.value[index].likes = [
-                    ...posts.value[index].likes,
-                    response.data.newNoti
-                        ? response.data.newLike
-                        : response.data
-                ];
-
-                if (response.data.newNoti) {
-                    socket?.emit("likePost", response.data.newNoti);
-                    return;
-                }
-            }
+            return await likeService.likePost(data);
         } catch (err) {
             console.log(err);
         }
     }
 
-    const unLikePostInPosts = async (postId, userId, index) => {
+    const unLikePostInPosts = async (postId, userId) => {
         try {
-            const response = await likeService.unLikePost(postId, userId);
-            if (response.status == 200 || response.status == 204) {
-                posts.value[index].likes = posts.value[index].likes.filter(like => like._id !== response.data._id);
-            }
+            return await likeService.unLikePost(postId, userId);
         } catch (err) {
             console.log(err);
         }
@@ -87,7 +67,6 @@ export default function () {
             const response = await commentService.getCommentsByPostId(postId, userId);
             if(response.status == 200) {
                 store.dispatch('post/handleSetComments', response.data);
-                return response;
             }
         } catch (err) {
             console.log(err);
@@ -162,6 +141,10 @@ export default function () {
                     'post/handleUpdateCommentsWithLike',
                     { newLikeComment, index }
                 )
+
+                if(response.data.newNoti) {
+                    socket?.emit('likeComment', response.data.newNoti);
+                }
             }
 
         } catch (err) {
@@ -169,16 +152,11 @@ export default function () {
         }
     }
 
-    const unLikeComment = async (commentId, userId, index) => {
+    const unLikeComment = async (commentId, userId, postId) => {
         try {
-
             const response = await likeCommentService.unlikeComment(commentId, userId);
-            if (response.status == 200 || response.status == 204) {
-                const newLikeComment = response.data.newNoti ? response.data.newLikeComment : response.data;
-                store.dispatch(
-                    'post/handleUpdateCommentsWithDislike',
-                    { newLikeComment, index }
-                )
+            if (response.status == 200) {
+                await getCommentsByPostId(postId, userId);
             }
         } catch (err) {
             console.log(err);

@@ -15,10 +15,10 @@
                         class=" hover:bg-gray-50 hover:rounded-3xl hover:translate-x-1 w-48 px-3 py-3 flex gap-4 transition duration-300">
                         <font-awesome-icon :icon="['fas', 'house']" class="text-2xl" />
                         <span :class="[
-                            this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications ? 'hidden' : '',
-                            route.name == 'Home'
-                                ? 'font-bold' : 'font-medium'
-                        ]" class="text-[0.8]">Trang chủ</span>
+                                this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications ? 'hidden' : '',
+                                route.name == 'Home'
+                                    ? 'font-bold' : 'font-medium'
+                            ]" class="text-[0.8]">Trang chủ</span>
                     </router-link>
                     <div id="showSearchBox"
                         class=" hover:bg-gray-50 hover:rounded-3xl cursor-pointer hover:translate-x-1 w-48 px-3 py-3 flex gap-4 transition duration-300">
@@ -32,33 +32,33 @@
                     <router-link to="/explore/people"
                         class=" hover:bg-gray-50 hover:rounded-3xl hover:translate-x-1 w-48 px-3 py-3 flex gap-4 transition duration-300">
                         <font-awesome-icon :icon="[
-                            route.name != 'Explore-People'
-                                || (route.name == 'Explore-People' &&
-                                    this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications)
-                                ? 'far' : 'fas',
-                            'compass']" class="text-2xl" />
+                                route.name != 'Explore-People'
+                                    || (route.name == 'Explore-People' &&
+                                        this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications)
+                                    ? 'far' : 'fas',
+                                'compass']" class="text-2xl" />
                         <span :class="[
-                            route.name == 'Explore-People' ? 'font-bold' : 'font-medium',
-                            this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications ? 'hidden' : ''
-                        ]
-                        " class=" text-[0.8]">Khám phá</span>
+                                route.name == 'Explore-People' ? 'font-bold' : 'font-medium',
+                                this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications ? 'hidden' : ''
+                            ]
+                            " class=" text-[0.8]">Khám phá</span>
                     </router-link>
                     <router-link to="/inbox"
                         class=" hover:bg-gray-50 hover:rounded-3xl hover:translate-x-1 w-48 px-3 py-3 flex gap-4 transition duration-300">
                         <font-awesome-icon :icon="[
-                            route.name != 'Inbox'
-                                || (route.name == 'Inbox' &&
-                                    this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications)
-                                ? 'far' : 'fas',
-                            'message']" class="text-2xl" />
+                                route.name != 'Inbox'
+                                    || (route.name == 'Inbox' &&
+                                        this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications)
+                                    ? 'far' : 'fas',
+                                'message']" class="text-2xl" />
                         <span :class="[
-                            route.name == 'Inbox' ? 'font-bold' : 'font-medium',
-                            this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications ? 'hidden' : ''
-                        ]
-                        " class=" text-[0.8]">Tin nhắn</span>
+                                route.name == 'Inbox' ? 'font-bold' : 'font-medium',
+                                this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications ? 'hidden' : ''
+                            ]
+                            " class=" text-[0.8]">Tin nhắn</span>
                     </router-link>
-                    <div id="showNotifications"
-                        class=" hover:bg-gray-50 hover:rounded-3xl hover:translate-x-1 w-48 px-3 py-3 flex gap-4 transition duration-300 cursor-pointer">
+                    <div id="showNotifications" @click="updateNotis(this.$store.state.auth.user?._id)"
+                        class="relative hover:bg-gray-50 hover:rounded-3xl hover:translate-x-1 w-48 px-3 py-3 flex gap-4 transition duration-300 cursor-pointer">
                         <font-awesome-icon v-if="!this.$store.state.modal?.showNotifications" class="text-2xl"
                             icon="fa-regular fa-heart" />
                         <font-awesome-icon v-else class="text-2xl"
@@ -66,7 +66,11 @@
                             icon="fa-solid fa-heart" />
                         <span
                             :class="{ 'hidden': this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications }"
-                            class="font-medium text-[0.8]">Thông báo</span>
+                            class="font-medium text-[0.8]">
+                            Thông báo
+                        </span>
+                        <div v-if="this.$store.state.auth.notifications && this.$store.state.auth.notifications.some(noti => noti.read == false)"
+                            class="bg-red-500 absolute w-3 h-3 top-2 rounded-full left-7"></div>
                     </div>
                     <div @click="handleShowModal"
                         class="hover:bg-gray-50 hover:rounded-3xl hover:translate-x-1 w-48 px-3 py-3 flex gap-4 transition duration-300 cursor-pointer">
@@ -78,14 +82,14 @@
                     <div v-if="this.$store.state.auth.user?._id" @click="arriveToUser(this.$store.state.auth.user?._id)"
                         class=" items-center hover:bg-gray-50 hover:rounded-3xl hover:translate-x-1 w-48 px-3 py-3 flex gap-4 transition duration-300 cursor-pointer">
                         <div :class="[
-                            route.name == 'User' ? 'border-[2px] rounded-full border-black' : ''
-                        ]">
+                                route.name == 'User' ? 'border-[2px] rounded-full border-black' : ''
+                            ]">
                             <img class="w-6 h-6 rounded-full" src="../../assets/images/image-login.avif" alt="">
                         </div>
                         <span :class="[
-                            this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications ? 'hidden' : '',
-                            route.name == 'User' ? 'font-bold' : 'font-medium'
-                        ]" class="text-[0.8]">Trang cá nhân</span>
+                                this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications ? 'hidden' : '',
+                                route.name == 'User' ? 'font-bold' : 'font-medium'
+                            ]" class="text-[0.8]">Trang cá nhân</span>
                     </div>
                     <div class="absolute bottom-8">
                         <div id="showMore"
@@ -133,6 +137,7 @@ import socket from "@/plugins/socket";
 import { onBeforeMount, ref, watch } from 'vue';
 
 import useUser from '@/uses/useUser';
+import useNoti from '@/uses/useNoti';
 
 export default {
     name: 'sidebarNavigation',
@@ -150,6 +155,10 @@ export default {
         const {
             arriveToUser,
         } = useUser();
+
+        const {
+            updateNotis,
+        } = useNoti();
 
         const isShowMore = ref(false);
 
@@ -201,6 +210,7 @@ export default {
             handleShowModal,
             handleLogOut,
             arriveToUser,
+            updateNotis,
             isShowMore,
             route,
         }
