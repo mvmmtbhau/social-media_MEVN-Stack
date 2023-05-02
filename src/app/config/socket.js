@@ -59,6 +59,13 @@ const createSocketIO = (httpServer) => {
             }
         });
 
+        socket.on("createComment", async (data) => {
+            const user = await getUser(data.toUser._id);
+            if (user && user.socketId) {
+                io.to(user.socketId).emit("getComment", data);
+            }
+        });
+
         socket.on("createPost", async (data) => {
             console.log(data);
 
@@ -72,9 +79,46 @@ const createSocketIO = (httpServer) => {
             const user =  await getUser(data.toUser._id);
 
             if(user && user.socketId){
-                io.to(user.socketId).emit("getLike", data);
+                io.to(user.socketId).emit("getLikePost", data);
             }
         });
+
+        socket.on("likeComment", async (data) => {
+            const user =  await getUser(data.toUser._id);
+            console.log(user);
+
+            if(user && user.socketId){
+                io.to(user.socketId).emit("likeComment", data);
+            }
+        });
+
+        socket.on('deleteComment', async (userId) => {
+            const user = await getUser(userId);
+            if(user && user.socketId) {
+                io.to(user.socketId).emit('deleteComment');
+            }
+        })
+
+        socket.on('deletePost', async (userId) => {
+            const user = await getUser(userId);
+            if(user && user.socketId) {
+                io.to(user.socketId).emit('deletePost');
+            }
+        })
+
+        socket.on('reportPost', async (userId) => {
+            const user = await getUser(userId);
+            if(user && user.socketId) {
+                io.to(user.socketId).emit('reportPost');
+            }
+        })
+
+        socket.on('reportComment', async (userId) => {
+            const user = await getUser(userId);
+            if(user && user.socketId) {
+                io.to(user.socketId).emit('reportComment');
+            }
+        })
 
         socket.on("disconnected", () => {
             console.log({socket});

@@ -4,13 +4,29 @@ const mongoose = require('mongoose');
 class MessageService {
     async getByUserId(req, res, next) {
         try {
-            console.log(req.params);
             const notis = await Notification.find({
-                toUser: req.params.userId,
+                toUser: req.params.userId
             }).populate('fromUser', '-userName -password');
-            if(notis) {
-                return res.status(200).send(notis);
-            }
+
+            return res.status(200).json(notis);
+        } catch (err) {
+            console.log(err);
+            return res.status(500).send(err);
+        }
+    }
+
+    async update(req, res, next) {
+        try {
+            const updateNotis = await Notification.updateMany(
+                {
+                    toUser: req.params.userId
+                },
+                {
+                    read: true,
+                }
+            )
+
+            if(updateNotis) return res.status(200).json(updateNotis);
         } catch (err) {
             console.log(err);
             return res.status(500).send(err);

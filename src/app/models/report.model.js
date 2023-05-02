@@ -21,7 +21,10 @@ const ReportSchema = new Schema({
         type: mongoose.Types.ObjectId,
         ref: 'Comment',
     },
-    status: Number,
+    status: {
+        type: Number,
+        default: 0,
+    },
     updatedAt: {
         type: Date,
         default: Date.now(),

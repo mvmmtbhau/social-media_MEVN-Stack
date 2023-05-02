@@ -13,7 +13,19 @@ class ReportService {
     }
 
     async find(filter) {
-        return Report.find(filter);
+        return Report.find(filter).populate({
+            path: 'post',
+            populate: {
+                path: 'owner',
+                select: '-userName -password'
+            }
+        }).populate({
+            path: 'comment',
+            populate: {
+                path: 'owner',
+                select: '-userName -password'
+            }
+        }).populate('optionReport').populate('fromUser', '-userName -password');
     }
 
     async findOne(filter) {
@@ -21,13 +33,26 @@ class ReportService {
     }
 
     async findLimit(filter, numLimit, skipNum, sortBy) {
-        return await Report.find(filter).sort(sortBy).limit(numLimit).skip(skipNum);
+        return await Report
+            .find(filter)
+            .sort(sortBy)
+            .limit(numLimit)
+            .skip(skipNum)
+            .populate('optionReport')
+            .populate('fromUser', '-userName -password')
+            .populate({
+                path: 'comment',
+                populate: {
+                    path: 'owner',
+                    select: '-userName -password'
+                }
+            });
     }
 
-    async update(optionId, data) {
+    async update(reportId, data) {
         const result = await Report.findByIdAndUpdate(
             {
-                _id: optionId,
+                _id: reportId,
             },
             {
                 $set: data,

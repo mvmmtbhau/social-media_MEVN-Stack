@@ -7,8 +7,8 @@ const Schema = mongoose.Schema;
 const NotificationSchema = new Schema({
     text: String,
     read: {
-        type: Number,
-        default: 0,
+        type: Boolean,
+        default: false,
     },
     postId: {
         type: mongoose.Types.ObjectId,

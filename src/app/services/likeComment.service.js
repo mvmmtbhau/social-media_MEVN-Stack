@@ -52,21 +52,19 @@ class LikeCommentService {
 
     async deleteLikeComment(req, res, next) {
         try {
-            const likeComment = await LikeComment.findOne({
-                belongToPost: req.params.commentId,
-                owner: req.params.userId
-            });
+            const like = await LikeComment.findOne({
+                belongToComment: req.params.commentId,
+                owner: req.params.userId,
+            })
 
-            if(!likeComment) return res.status(404).send("Like comment not found");
-            
-            const result = await LikeComment.findByIdAndDelete(likeComment.id);
+            const result = await LikeComment.findByIdAndDelete(like._id);
 
             if (result) {
                 const updateComment = await Comment.findByIdAndUpdate(
-                    result.belongToComment,
+                    like.belongToComment,
                     {
                         $pullAll: {
-                            likes: [result._id],
+                            likes: [like._id],
                         }
                     }
                 );

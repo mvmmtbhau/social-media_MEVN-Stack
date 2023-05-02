@@ -1,6 +1,6 @@
 const reportService = require('../services/report.service');
 
-class OptionReportController {
+class ReportController {
     async addNew(req, res, next) {
         try {
             const data = {
@@ -19,105 +19,104 @@ class OptionReportController {
         }
     }
 
-    // async getAll(req, res, next) {
-    //     try {
-    //         const new_per_page = req.query.per_page;
-    //         let skipNum = (req.query.page - 1) * new_per_page;
-    //         let sortBy;
+    async getReportPost(req, res, next) {
+        try {
+            const reports = await reportService.find({
+                post: {
+                    $ne: null
+                },
+                status: 0
+            });
 
-    //         const pattern = "[\\s]" + req.query.search_text + "|^" + req.query.search_text;
+            return res.status(200).json(reports);
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+    }
 
-    //         const filter = {
-    //             text: {
-    //                 $regex: pattern,
-    //                 $options: 'i',
-    //             }
-    //         };
+    async getReportComment(req, res, next) {
+        try {
+            const new_per_page = req.query.per_page;
+            let skipNum = (req.query.page - 1) * new_per_page;
+            let sortBy;
 
-    //         if (req.query.sort_by == 0) {
-    //             sortBy = {
-    //                 createdAt: 'asc'
-    //             }
-    //         }
+            if (req.query.sort_by == 0) {
+                sortBy = {
+                    createdAt: 'asc'
+                }
+            }
 
-    //         if (req.query.sort_by == 1) {
-    //             sortBy = {
-    //                 createdAt: 'desc'
-    //             }
-    //         }
+            if (req.query.sort_by == 1) {
+                sortBy = {
+                    createdAt: 'desc'
+                }
+            }
 
-    //         if (req.query.sort_by == 2) {
-    //             sortBy = {
-    //                 text: 'asc'
-    //             }
-    //         }
+            if (req.query.sort_by == 2) {
+                sortBy = {
+                    text: 'asc'
+                }
+            }
 
-    //         if (req.query.sort_by == 3) {
-    //             sortBy = {
-    //                 text: 'desc'
-    //             }
-    //         }
+            if (req.query.sort_by == 3) {
+                sortBy = {
+                    text: 'desc'
+                }
+            }
 
-    //         const options = await optionService.findLimit(
-    //             req.query.search_text == '' ? {} : filter,
-    //             new_per_page,
-    //             skipNum,
-    //             sortBy
-    //         );
+            const reports = await reportService.findLimit(
+                {
+                    comment: {
+                        $ne: null,
+                    },
+                    status: 0,
+                },
+                new_per_page,
+                skipNum,
+                sortBy
+            );
 
-    //         const totalOptions = await optionService.find(req.query.search_text == '' ? {} : filter);
+            const totalReports = await reportService.find({});
 
-    //         const totalPage = Math.ceil(totalOptions.length / new_per_page)
+            const totalPage = Math.ceil(totalReports.length / new_per_page)
 
-    //         return res.status(200).json({
-    //             options,
-    //             totalPage,
-    //         });
+            return res.status(200).json({
+                reports,
+                totalPage,
+            });
 
-    //     } catch (err) {
-    //         return res.status(500).json(err);
-    //     }
-    // }
-    
-    // async updateOption(req, res, next) {
-    //     try {
-    //         const isExisted = await optionService.findOne(
-    //             {
-    //                 text: req.body.text
-    //             }
-    //         )
+            
+            
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+    }
 
-    //         if(isExisted) return res.status(303).json('Option này đã có, xin đổi tên khác');
+    async updateReport(req, res, next) {
+        try {
+            const report = await reportService.findOne(
+                {
+                    _id: req.body.reportId,
+                }
+            )
 
-    //         const optionUpdated = await optionService.update(
-    //             req.params.id,
-    //             {
-    //                 text: req.body.text,
-    //             }
-    //         )
+            if(!report) return res.status(404).json('Report not found');
 
-    //         if(!optionUpdated) return res.status(404).json('Option này không tồn tại');
+            const update = await reportService.update(
+                req.body.reportId,
+                {
+                    status: req.body.status
+                }
+            )
 
-    //         return res.status(200).json('Cập nhật thành công');
-
-    //     } catch (err) {
-    //         console.log(err);
-    //         return res.status(500).json(err);
-    //     }
-    // }
-
-    // async deleteOption(req, res, next) {
-    //     try {
-    //         const optionDeleted = await optionService.delete(req.params.id);
-
-    //         if(!optionDeleted) return res.status(404).json('Option này không tồn tại');
-
-    //         return res.status(200).json('Xóa thành công');
-    //     } catch (err) {
-    //         console.log(err);
-    //         return res.status(500).json(err);
-    //     }
-    // }
+            if(update) return res.status(200).json('Update successful');
+        } catch (err) {
+            console.log(err);
+            return res.status(500).json(err);
+        }
+    }
 }
 
-module.exports = new OptionReportController;
+module.exports = new ReportController;

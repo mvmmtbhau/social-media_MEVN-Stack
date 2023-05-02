@@ -49,18 +49,30 @@ class CommentService {
             const postId = req.params.postId;
             const userId = req.params.userId;
 
-            const reports = await Report.find({
+            const reportFromUser = await Report.find({
                 fromUser: userId,
                 comment: {
                     $ne: null,
                 }
             })
 
+            const reports = await Report.find({
+                comment: {
+                    $ne: null
+                }
+            }).populate('comment')
+
             const commentIdArr = [];
 
-            reports.forEach(report => {
+            reportFromUser.forEach(report => {
                 commentIdArr.push(report.comment);
             });
+
+            reports.forEach(report => {
+                if (report.comment.owner == userId && report.status == 1) {
+                    commentIdArr.push(report.comment._id);
+                }
+            })
 
             const comments = await Comment.find({
                 belongToPost: postId,
@@ -78,8 +90,8 @@ class CommentService {
     async deleteById(req, res, next) {
         try {
             const commentDeleted = await Comment.findByIdAndDelete(req.params.id);
-            
-            if(!commentDeleted) return res.status(404).json('Không tìm thấy comment');
+
+            if (!commentDeleted) return res.status(404).json('Không tìm thấy comment');
 
             return res.status(200).json('Xóa thành công');
         } catch (err) {

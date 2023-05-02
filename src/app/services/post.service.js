@@ -38,15 +38,27 @@ class MessageService {
                 _id: userId
             }).populate('follows');
 
-            const report = await Report.find({
+            const reportFromUser = await Report.find({
                 fromUser: userId,
                 post: {
                     $ne: null
                 }
             });
 
-            report.forEach(report => {
+            const reports = await Report.find({
+                post: {
+                    $ne: null
+                }
+            }).populate('post');
+
+            reportFromUser.forEach(report => {
                 postIdArr.push(report.post)
+            })
+
+            reports.forEach(report => {
+                if(report.post.owner == userId && report.status == 1) {
+                    postIdArr.push(report.post._id);
+                }
             })
 
             const posts = await Post.find({
