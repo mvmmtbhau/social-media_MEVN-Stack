@@ -13,8 +13,9 @@
                                     <v-carousel-item v-for="image in this.$store.state.post.post?.images" :key="image">
                                         <v-sheet class="h-full w-full bg-cyan-500" tile>
                                             <div class="h-full w-full">
-                                                <img :src="publicImage + image.filename"
+                                                <img v-if="image.mimetype != 'video/mp4'" :src="publicImage + image.filename"
                                                     class="h-full w-full object-contain">
+                                                <video v-else :src="publicImage + image.filename" autoplay controls muted preload class="h-full w-full object-contain"></video>
                                             </div>
                                         </v-sheet>
                                     </v-carousel-item>

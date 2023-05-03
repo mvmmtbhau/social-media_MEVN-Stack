@@ -26,7 +26,10 @@
                     <v-carousel-item v-for="image in post?.images" :key="image">
                         <v-sheet class="h-full w-full bg-cyan-500" tile>
                             <div class="h-full w-full">
-                                <img :src="publicImage + image.filename" class="h-full w-full object-contain">
+                                <img v-if="image.mimetype != 'video/mp4'" :src="publicImage + image.filename"
+                                    class="h-full w-full object-contain">
+                                <video v-else :src="publicImage + image.filename"
+                                    class="h-full w-full object-contain video_div" autoplay muted loop controls></video>
                             </div>
                         </v-sheet>
                     </v-carousel-item>
@@ -34,12 +37,11 @@
                 <div class="relative text-2xl flex px-1 py-4 gap-4">
                     <font-awesome-icon v-if="post?.likes && post?.likes.length &&
                         post?.likes.some(like => like.owner === this.$store.state.auth.user?._id)"
-                        @click="handleUnLike(post?._id, this.$store.state.auth.user?._id, index)"
-                        icon="fa-solid fa-heart" class="cursor-pointer text-red " />
+                        @click="handleUnLike(post?._id, this.$store.state.auth.user?._id, index)" icon="fa-solid fa-heart"
+                        class="cursor-pointer text-red " />
 
                     <font-awesome-icon v-else icon="fa-regular fa-heart"
-                        @click="handleLike(post?._id, this.$store.state.auth.user?._id, index)"
-                        class="cursor-pointer" />
+                        @click="handleLike(post?._id, this.$store.state.auth.user?._id, index)" class="cursor-pointer" />
 
                     <font-awesome-icon icon="fa-regular fa-comment" class="cursor-pointer"
                         @click="arriveToPost(post._id)" />
@@ -101,12 +103,12 @@ export default {
 
         const fetchPosts = async (userId) => {
             const response = await getAllPosts(userId);
-            if(response.status == 200) {
+            if (response.status == 200) {
                 posts.value = response.data;
             }
         }
 
-        onBeforeMount(async() => {
+        onBeforeMount(async () => {
             getUserById(store.state.auth.user._id);
             fetchPosts(store.state.auth.user?._id);
         })
@@ -150,6 +152,41 @@ export default {
         socket?.on('reportPost', () => {
             fetchPosts(store.state.auth.user?._id);
         })
+
+        function playPauseVideo() {
+            let videos = document.querySelectorAll('.video_div');
+
+            console.log(videos);
+
+            videos.forEach((video) => {
+                // We can only control playback without insteraction if video is mute
+                video.muted = true;
+                // Play is a promise so we need to check we have it
+                let playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.then((_) => {
+                        let observer = new IntersectionObserver(
+                            (entries) => {
+                                entries.forEach((entry) => {
+                                    if (
+                                        entry.intersectionRatio !== 1 &&
+                                        !video.paused
+                                    ) {
+                                        video.pause();
+                                    } else if (video.paused) {
+                                        video.play();
+                                    }
+                                });
+                            },
+                            { threshold: 0.2 }
+                        );
+                        observer.observe(video);
+                    });
+                }
+            });
+        }
+        
+        playPauseVideo();
 
         return {
             showActionModal,

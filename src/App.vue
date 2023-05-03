@@ -28,29 +28,28 @@ export default {
     })
 
     const getCurrentUser = async () => {
-      const accessToken = localStorage.getItem('access_token') || null;
-      if(accessToken) {
+      const accessToken = localStorage.getItem('accessToken') || null;
+      if (accessToken) {
         const decoded = jwt_decode(accessToken);
-
+        
         store.dispatch('auth/handleSetUser', decoded);
 
-        if((store.state.auth.user?.role == 'user') && (location.pathname == '/login' || location.pathname == '/register') ) {
+        if (store.state.auth.user?.role == 'user' && (location.pathname == '/login' || location.pathname == '/register')) {
           router.push({
             name: 'Home',
           });
           getConversations(store.state.auth.user?._id);
         }
 
-        if(store.state.auth.user?.role == 'admin') {
+        if (store.state.auth.user?.role == 'admin') {
           router.push({
             name: 'AdminHome',
           })
         }
       }
 
-      if(!accessToken || !store.state.auth.user) {
-        store.dispatch('auth/handleSetUser', null);
-
+      if (accessToken == null || store.state.auth?.user == null) {
+        console.log(accessToken);
         router.push({
           name: 'Login',
         })

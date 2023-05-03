@@ -91,10 +91,10 @@ export default {
                 }
 
                 const response = await AuthService.login(data);
-                if (response.status === 200) {
+                if (response.status == 200) {
                     const access_token = response.data.accessToken;
 
-                    localStorage.setItem('access_token', access_token);
+                    localStorage.setItem('accessToken', access_token);
                     
                     const decodedPayload = jwt_decode(access_token);
 

@@ -4,7 +4,10 @@
             <span>Gợi ý</span>
         </div>
         <div>
-            <div v-for="user in users" :key="user" class="relative flex items-center gap-4 text-sm py-2">
+            <div v-if="users.length == 0">
+                Hiện tại chưa có gợi ý kết bạn nào.
+            </div>
+            <div v-else v-for="user in users" :key="user" class="relative flex items-center gap-4 text-sm py-2">
                 <img v-if="user?.avatar" :src="publicImage + user?.avatar.filename" @click="arriveToUser(user?._id)"
                     class="w-12 h-12 rounded-full cursor-pointer">
                 <img v-else src="../../assets/images/no-avatar.jfif" @click="arriveToUser(user?._id)"

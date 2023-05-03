@@ -1,7 +1,7 @@
 import axios from "axios";
 
 
-axios.defaults.headers.common["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`;
+axios.defaults.headers.common["Authorization"] = `Bearer ${localStorage.getItem("accessToken")}`;
 
 const instance = axios.create({
     baseURL: 'http://localhost:3000/api',
@@ -32,7 +32,7 @@ instance.interceptors.response.use(
       const response = error?.response;
       if (response.status === 401) {
         window.location.href ="/login";
-        localStorage.removeItem('access_token');
+        localStorage.removeItem('accessToken');
         return Promise.reject(error);
       }
       if (response.status === 403) {

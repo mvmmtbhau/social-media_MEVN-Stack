@@ -31,7 +31,7 @@
                                             class="bg-white rounded-xl p-2 cursor-pointer hover:-translate-y-1" />
                                     </label>
                                     <Field hidden type="file" v-model="images" @change="showImage" name="images" id="images"
-                                    multiple="multiple" />
+                                        multiple="multiple" />
                                 </div>
                             </div>
                         </div>
@@ -48,7 +48,7 @@
                                     placeholder="Viết chú thích..." />
                             </div>
                             <div>
-                                <span>Hahaha</span>
+                                <div id="error_message" class="text-red"></div>
                             </div>
                         </div>
                     </div>
@@ -76,10 +76,6 @@ export default {
         const store = useStore();
         const images = ref();
         const content = ref();
-
-        watch(images, (newValue) => {
-            console.log(newValue);
-        })
 
         const closeModal = () => {
             store.dispatch('modal/handleShowCreatePostModal', false);
@@ -109,9 +105,39 @@ export default {
 
         const showImage = (e) => {
             let divWrap = document.getElementById('showImages');
+            let errorMessage = document.getElementById('error_message');
+            const ele = document.getElementById('error_text');
+            if(ele) {
+                ele.remove();
+            }
 
             const imgs = [];
             for (let i = 0; i < images.value.length; i++) {
+                let typeFile = images.value[i].type;
+                const arr = typeFile.split('/');
+                
+                if(arr[1] == 'mp4' || arr[1] == 'png' || arr[1] == 'jpeg' || arr[1] == 'jpg') {
+                } else {
+                    let errorText = document.createElement('p');
+                    errorText.id = 'error_text';
+                    let textNode = document.createTextNode('Chỉ được đăng video .mp4 hoặc ảnh loại (png, jpeg, jpg).');
+                    errorText.appendChild(textNode);
+                    errorMessage.appendChild(errorText);
+                    images.value = ''
+                    return;
+                }
+
+                if(images.value[i].size >= 1024*1000*5) {
+                    let errorText = document.createElement('p');
+                    errorText.id = 'error_text';
+                    let textNode = document.createTextNode('Ảnh hoặc video tối đa 5MB');
+                    errorText.appendChild(textNode);
+                    errorMessage.appendChild(errorText);
+                    images.value = images.value.filter(image => image.size >= 1024*1000*5);
+                    if(images.value.length = 0) images.value = '';
+                    return;
+                }
+
                 let divImage = document.createElement('div');
                 divImage.className = "relative bg-black h-48 w-full";
 
@@ -120,18 +146,49 @@ export default {
                 spanEle.append('x');
                 spanEle.addEventListener('click', () => {
                     spanEle.parentElement.remove();
-                    images.value.splice(i,1);
-
+                    images.value.splice(i, 1);
+                    if(images.value.length = 0) images.value = '';
                 })
 
-                let img = document.createElement('img');
-                img.className = 'h-full w-full object-cover';
-                img.src = URL.createObjectURL(e.target.files[i]);
+                if (images.value[i].type == 'video/mp4') {
+                    let videoTag = document.createElement('video');
+                    videoTag.className = 'h-full w-full object-cover video_div';
 
-                divImage.append(img);
-                divImage.append(spanEle);
+                    videoTag.src = URL.createObjectURL(images.value[i]);
+                    videoTag.type = 'video/mp4';
 
-                divWrap.append(divImage);
+                    videoTag.autoplay = true;
+                    videoTag.muted = true;
+                    videoTag.controls = true;
+                    videoTag.preload = true;
+
+                    divImage.append(videoTag);
+                    divImage.append(spanEle);
+
+                    divWrap.append(divImage);
+                } else {
+                    let img = document.createElement('img');
+                    img.className = 'h-full w-full object-cover image_div';
+                    img.src = URL.createObjectURL(images.value[i]);
+
+                    divImage.append(img);
+                    divImage.append(spanEle);
+
+                    divWrap.append(divImage);
+                }
+
+                const videoEle = document.querySelectorAll('.video_div').length;
+                const imgEle = document.querySelectorAll('.image_div').length;
+
+                if(images.value.length > 4 || (videoEle + imgEle) > 4) {
+                    let errorText = document.createElement('p');
+                    errorText.id = 'error_text';
+                    let textNode = document.createTextNode('Tối đa 4 ảnh hoặc video');
+                    errorText.appendChild(textNode);
+                    errorMessage.appendChild(errorText);
+                    images.value = '';
+                    return;
+                }
             }
         }
 

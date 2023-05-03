@@ -68,7 +68,7 @@ export default {
 
         const logout = () => {
             if (confirm('Bạn muốn đăng xuất?')) {
-                localStorage.setItem("access_token", "");
+                localStorage.removeItem("accessToken");
                 store.dispatch('auth/handleSetUser', null);
                 router.push('/login');
             }

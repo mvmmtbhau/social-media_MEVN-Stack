@@ -25,8 +25,7 @@
                             <!-- <font-awesome-icon :icon="['fas', 'gear']" class="text-xl cursor-pointer" /> -->
                         </div>
                         <div v-else class="">
-                            <div v-if="
-                                this.$store.state.auth.user?.follows.some(
+                            <div v-if="this.$store.state.auth.user?.follows.some(
                                     follow => follow.followUser?._id == this.$store.state.auth.userById?._id
                                         && follow.state)" class="flex gap-3 items-center">
                                 <span class="text-xl font-bold">
@@ -44,9 +43,9 @@
                                 </span>
                             </div>
                             <div v-else-if="this.$store.state.auth.user?.follows.some(
-                                follow => follow.followUser?._id == this.$store.state.auth.userById?._id
-                                    && !follow.state
-                            )" class="flex gap-3 items-center">
+                                    follow => follow.followUser?._id == this.$store.state.auth.userById?._id
+                                        && !follow.state
+                                )" class="flex gap-3 items-center">
                                 <span class="text-xl font-bold">
                                     {{ this.$store.state.auth.userById?.fullName }}
                                 </span>
@@ -60,8 +59,7 @@
                                 <span class="text-xl font-bold">
                                     {{ this.$store.state.auth.userById?.fullName }}
                                 </span>
-                                <span
-                                    @click="followUser(this.$store.state.auth.user._id, this.$store.state.auth.userById)"
+                                <span @click="followUser(this.$store.state.auth.user._id, this.$store.state.auth.userById)"
                                     class="bg-blue text-white px-3 py-2 rounded-md text-sm font-bold hover:-translate-y-1 cursor-pointer">
                                     Theo dõi
                                 </span>
@@ -71,14 +69,13 @@
                     <div class="info_2 flex flex-col gap-2 py-2">
                         <div class="flex gap-4">
                             <p class="flex gap-1" :class="{
-                                'cursor-pointer':
-                                    this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id
-                                    || !this.$store.state.auth.userById?.private
-                                    || this.$store.state.auth.userById?.private && this.$store.state.auth.user?.follows.some(
-                                        follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true)
-                            }"
-                                @click="
-                                    this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id
+                                    'cursor-pointer':
+                                        this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id
+                                        || !this.$store.state.auth.userById?.private
+                                        || this.$store.state.auth.userById?.private && this.$store.state.auth.user?.follows.some(
+                                            follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true)
+                                }"
+                                @click="this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id
                                         || !this.$store.state.auth.userById?.private
                                         || this.$store.state.auth.userById?.private && this.$store.state.auth.user?.follows.some(
                                             follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true) ? isShowFollowersModal = true : ''">
@@ -97,9 +94,9 @@
                                         follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true)
                             }"
                                 @click="this.$store.state.auth.user?._id == this.$store.state.auth.userById?._id
-                                    || !this.$store.state.auth.userById?.private
-                                    || this.$store.state.auth.userById?.private && this.$store.state.auth.user?.follows.some(
-                                        follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true) ? isShowFollowingModal = true : ''">
+                                        || !this.$store.state.auth.userById?.private
+                                        || this.$store.state.auth.userById?.private && this.$store.state.auth.user?.follows.some(
+                                            follow => follow.followUser._id == this.$store.state.auth.userById?._id && follow.state == true) ? isShowFollowingModal = true : ''">
                                 <span>Đang theo dõi</span>
                                 <span class="font-bold">
                                     {{ this.$store.state.auth.userById?.follows.filter(
@@ -159,13 +156,19 @@
                 <div v-if="isShowPosts" class="grid grid-cols-3 gap-4">
                     <div class="w-full h-[18rem] cursor-pointer hover:-translate-y-2" @click="showModal(post._id)"
                         v-for="post in this.$store.state.auth.userById?.posts" :key="post._id">
-                        <img :src="publicImage + post.images[0].filename" class="w-full h-full border-1 object-cover">
+                        <img v-if="post.images[0].mimetype != 'video/mp4'" :src="publicImage + post.images[0].filename"
+                            class="w-full h-full border-1 object-cover">
+                        <video v-else :src="publicImage + post.images[0].filename"
+                            class="w-full h-full border-1 object-cover"></video>
                     </div>
                 </div>
                 <div v-else class="grid grid-cols-3 gap-4">
                     <div class="w-full h-[18rem] cursor-pointer hover:-translate-y-2" @click="showModal(post._id)"
                         v-for="post in this.$store.state.auth.userById?.savedPosts" :key="post._id">
-                        <img :src="publicImage + post.images[0].filename" class="w-full h-full border-1 object-cover">
+                        <img v-if="post.images[0].mimetype != 'video/mp4'" :src="publicImage + post.images[0].filename"
+                            class="w-full h-full border-1 object-cover">
+                        <video v-else :src="publicImage + post.images[0].filename"
+                            class="w-full h-full border-1 object-cover"></video>
                     </div>
                 </div>
             </div>
@@ -192,9 +195,9 @@
                             v-for="follower in this.$store.state.auth.userById?.hasFollowers.filter(follow => follow.state == true)"
                             :key="follower">
                             <router-link :to="{
-                                name: 'User',
-                                params: { id: follower.fromUser._id }
-                            }" class="rounded-full">
+                                    name: 'User',
+                                    params: { id: follower.fromUser._id }
+                                }" class="rounded-full">
                                 <img v-if="follower.fromUser?.avatar" :src="publicImage + follower.fromUser.avatar.filename"
                                     class="w-12 h-12 rounded-full cursor-pointer">
                                 <img v-else src="../../assets/images/no-avatar.jfif"
@@ -202,9 +205,9 @@
                             </router-link>
                             <div class="flex items-center gap-1 text-sm">
                                 <router-link :to="{
-                                    name: 'User',
-                                    params: { id: follower.fromUser._id }
-                                }" class="font-bold w-32 break-keep" v-if="follower.fromUser.fullName.length < 16">
+                                        name: 'User',
+                                        params: { id: follower.fromUser._id }
+                                    }" class="font-bold w-32 break-keep" v-if="follower.fromUser.fullName.length < 16">
                                     {{ follower.fromUser.fullName }}
                                 </router-link>
                                 <router-link :to="{
@@ -255,7 +258,7 @@
                             class="text-red text-center font-bold py-3 w-full border-b-2 cursor-pointer">
                             Xóa
                         </span>
-                        <span @click="isShowDeleteFollowerModal = false" class="w-full text-center py-3 cursor-pointer">
+                        <span @click=" isShowDeleteFollowerModal = false " class="w-full text-center py-3 cursor-pointer">
                             Hủy
                         </span>
                     </div>
@@ -263,58 +266,66 @@
             </div>
         </div>
 
-        <div v-if="isShowFollowingModal" class="fixed z-20">
-            <div class="upload_file_modal flex items-center justify-center relative" @click="isShowFollowingModal = false">
+        <div v-if=" isShowFollowingModal " class="fixed z-20">
+            <div class="upload_file_modal flex items-center justify-center relative" @click=" isShowFollowingModal = false ">
                 <div class="modal bg-white h-[25rem] rounded-[0.6rem] w-[25rem]" @click.stop>
                     <div class="relative py-3 border-b-2 text-center">
                         <span class="font-[600]">Đang theo dõi</span>
                         <font-awesome-icon icon="fa-solid fa-xmark" class="absolute right-3 text-2xl cursor-pointer"
-                            @click="isShowFollowingModal = false" />
+                            @click=" isShowFollowingModal = false " />
                     </div>
                     <div class="overflow-y-scroll overflow-x-hidden h-[21rem]">
                         <div class="relative flex gap-3 px-4 py-2 items-center w-full"
-                            v-for="following in this.$store.state.auth.userById?.follows.filter(follow => follow.state == true)"
-                            :key="following">
-                            <router-link :to="{
-                                name: 'User',
-                                params: { id: following.followUser._id }
-                            }" class="rounded-full">
-                                <img v-if="following.followUser?.avatar"
-                                    :src="publicImage + following.followUser.avatar.filename"
+                            v-for=" following  in  this.$store.state.auth.userById?.follows.filter(follow => follow.state == true) "
+                            :key=" following ">
+                            <router-link :to="
+                                {
+                                    name: 'User',
+                                        params: { id: following.followUser._id }
+                                }
+                            " class="rounded-full">
+                                <img v-if=" following.followUser?.avatar "
+                                    :src=" publicImage + following.followUser.avatar.filename "
                                     class="w-12 h-12 rounded-full cursor-pointer">
                                 <img v-else src="../../assets/images/no-avatar.jfif"
                                     class="w-12 h-12 rounded-full cursor-pointer">
                             </router-link>
                             <div class="flex items-center gap-1 text-sm">
-                                <router-link :to="{
-                                    name: 'User',
-                                    params: { id: following.followUser._id }
-                                }" class="font-bold w-32 break-keep" v-if="following.followUser.fullName.length < 16">
+                                <router-link :to="
+                                    {
+                                        name: 'User',
+                                            params: { id: following.followUser._id }
+                                    }
+                                " class="font-bold w-32 break-keep" v-if=" following.followUser.fullName.length < 16 ">
                                     {{ following.followUser.fullName }}
                                 </router-link>
-                                <router-link :to="{
-                                    name: 'User',
-                                    params: { id: following.followUser._id }
-                                }" class="font-bold w-32 break-keep" v-else>
+                                <router-link :to="
+                                    {
+                                        name: 'User',
+                                            params: { id: following.followUser._id }
+                                    }
+                                " class="font-bold w-32 break-keep" v-else>
                                     {{ following.followUser.fullName.substring(0, 13) + '...' }}
                                 </router-link>
                             </div>
                             <div class="absolute right-4"
-                                v-if="this.$store.state.auth.user?._id != following.followUser._id">
+                                v-if=" this.$store.state.auth.user?._id != following.followUser._id ">
                                 <span
-                                    v-if="!this.$store.state.auth.user?.follows.length
+                                    v-if="
+                                        !this.$store.state.auth.user?.follows.length
                                         || this.$store.state.auth.user?.follows.length
-                                        && !this.$store.state.auth.user?.follows.some(follow => follow.followUser._id == following.followUser._id)"
-                                    @click="followUser(this.$store.state.auth.user?._id, following.followUser)"
+                                        && !this.$store.state.auth.user?.follows.some(follow => follow.followUser._id == following.followUser._id)
+                                    "
+                                    @click=" followUser(this.$store.state.auth.user?._id, following.followUser) "
                                     class=" right-4 text-sm text-white bg-cyan-500 py-1 px-2 font-bold cursor-pointer hover:bg-cyan-600 rounded-md">
                                     Theo dõi
                                 </span>
-                                <span v-else @click="showDeleteFollowingModal(following.followUser)"
+                                <span v-else @click=" showDeleteFollowingModal(following.followUser) "
                                     class=" right-4 text-sm bg-gray-200 py-1 px-2 font-bold cursor-pointer hover:bg-gray-300 rounded-md">
                                     {{
-                                        this.$store.state.auth.user?.follows.some(follow => follow.followUser._id ==
-                                            following.followUser._id && follow.state == true)
-                                        ? 'Đang theo dõi' : 'Đã yêu cầu'
+                                    this.$store.state.auth.user?.follows.some(follow => follow.followUser._id ==
+                                    following.followUser._id && follow.state == true)
+                                    ? 'Đang theo dõi' : 'Đã yêu cầu'
                                     }}
                                 </span>
                             </div>
@@ -323,30 +334,30 @@
                 </div>
             </div>
         </div>
-        <div v-if="isShowDeleteFollowingModal" class="fixed z-30">
+        <div v-if=" isShowDeleteFollowingModal " class="fixed z-30">
             <div class="upload_file_modal flex items-center justify-center relative"
-                @click="isShowDeleteFollowingModal = false">
+                @click=" isShowDeleteFollowingModal = false ">
                 <div class="modal bg-white h-[20rem] rounded-[0.6rem] w-[25rem]" @click.stop>
                     <div class="flex flex-col gap-6 items-center border-b-2 py-10">
-                        <img v-if="follower.avatar" :src="publicImage + follower.avatar.filename"
+                        <img v-if=" follower.avatar " :src=" publicImage + follower.avatar.filename "
                             class="w-24 h-24 rounded-full">
                         <img v-else src="../../assets/images/no-avatar.jfif" class="w-24 h-24 rounded-full">
                         <div class="flex flex-col items-center w-[80%]">
                             <p class="text-center text-sm text-gray-500">
                                 {{ follower.private
-                                    ? 'Nếu đổi ý, bạn sẽ phải yêu cầu theo dõi lại @' + follower.fullName + '.'
-                                    : 'Bỏ theo dõi @' + follower.fullName + '?' }}
+                                ? 'Nếu đổi ý, bạn sẽ phải yêu cầu theo dõi lại @' + follower.fullName + '.'
+                                : 'Bỏ theo dõi @' + follower.fullName + '?' }}
                             </p>
                         </div>
                     </div>
                     <div class="flex flex-col items-center">
                         <span
-                            @click="unFollowUser(this.$store.state.auth.user?._id, follower._id); isShowDeleteFollowingModal = false"
+                            @click=" unFollowUser(this.$store.state.auth.user?._id, follower._id); isShowDeleteFollowingModal = false "
                             class="text-red text-center font-bold w-full border-b-2 cursor-pointer"
-                            :class="[follower.private ? 'p-2' : 'p-3']">
+                            :class=" [follower.private ? 'p-2' : 'p-3'] ">
                             Bỏ theo dõi
                         </span>
-                        <span @click="isShowDeleteFollowingModal = false" class="w-full text-center py-2 cursor-pointer">
+                        <span @click=" isShowDeleteFollowingModal = false " class="w-full text-center py-2 cursor-pointer">
                             Hủy
                         </span>
                     </div>
@@ -354,47 +365,53 @@
             </div>
         </div>
 
-        <div v-if="isShowRequestModal" class="fixed z-20">
-            <div class="upload_file_modal flex items-center justify-center relative" @click="isShowRequestModal = false">
+        <div v-if=" isShowRequestModal " class="fixed z-20">
+            <div class="upload_file_modal flex items-center justify-center relative" @click=" isShowRequestModal = false ">
                 <div class="modal bg-white h-[25rem] rounded-[0.6rem] w-[25rem]" @click.stop>
                     <div class="relative py-3 border-b-2 text-center">
                         <span class="font-[600]">Yêu cầu theo dõi</span>
                         <font-awesome-icon icon="fa-solid fa-xmark" class="absolute right-3 text-2xl cursor-pointer"
-                            @click="isShowRequestModal = false" />
+                            @click=" isShowRequestModal = false " />
                     </div>
                     <div class="overflow-y-scroll overflow-x-hidden h-[21rem]">
                         <div class="relative flex gap-3 px-4 py-2 items-center w-full"
-                            v-for="request in this.$store.state.auth.userById?.hasFollowers.filter(follow => follow.state == false)"
-                            :key="request">
-                            <router-link :to="{
-                                name: 'User',
-                                params: { id: request.fromUser._id }
-                            }" class="rounded-full">
-                                <img v-if="request.fromUser?.avatar" :src="publicImage + request.fromUser.avatar.filename"
+                            v-for=" request  in  this.$store.state.auth.userById?.hasFollowers.filter(follow => follow.state == false) "
+                            :key=" request ">
+                            <router-link :to="
+                                {
+                                    name: 'User',
+                                        params: { id: request.fromUser._id }
+                                }
+                            " class="rounded-full">
+                                <img v-if=" request.fromUser?.avatar " :src=" publicImage + request.fromUser.avatar.filename "
                                     class="w-12 h-12 rounded-full cursor-pointer">
                                 <img v-else src="../../assets/images/no-avatar.jfif"
                                     class="w-12 h-12 rounded-full cursor-pointer">
                             </router-link>
                             <div class="flex items-center gap-1 text-sm">
-                                <router-link :to="{
-                                    name: 'User',
-                                    params: { id: request.fromUser._id }
-                                }" class="font-bold w-32 break-keep" v-if="request.fromUser.fullName.length < 16">
+                                <router-link :to="
+                                    {
+                                        name: 'User',
+                                            params: { id: request.fromUser._id }
+                                    }
+                                " class="font-bold w-32 break-keep" v-if=" request.fromUser.fullName.length < 16 ">
                                     {{ request.fromUser.fullName }}
                                 </router-link>
-                                <router-link :to="{
-                                    name: 'User',
-                                    params: { id: request.fromUser._id }
-                                }" class="font-bold w-32 break-keep" v-else>
+                                <router-link :to="
+                                    {
+                                        name: 'User',
+                                            params: { id: request.fromUser._id }
+                                    }
+                                " class="font-bold w-32 break-keep" v-else>
                                     {{ request.fromUser.fullName.substring(0, 16) + '...' }}
                                 </router-link>
                             </div>
                             <div class="absolute right-2 flex gap-1">
-                                <span @click="unFollowUser(request.fromUser._id, request.followUser)"
+                                <span @click=" unFollowUser(request.fromUser._id, request.followUser) "
                                     class=" text-sm bg-gray-200 py-1 px-2 font-bold cursor-pointer hover:bg-gray-300 rounded-md">
                                     Xóa
                                 </span>
-                                <span @click="updateFollow(request.fromUser._id, request._id)"
+                                <span @click=" updateFollow(request.fromUser._id, request._id) "
                                     class="text-sm bg-cyan-500 text-white py-1 px-2 font-bold cursor-pointer hover:bg-cyan-600 rounded-md">
                                     Chấp nhận
                                 </span>
