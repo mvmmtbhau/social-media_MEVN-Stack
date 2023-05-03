@@ -80,7 +80,8 @@ const router = createRouter({
       name: 'AdminHome',
       component: () => import(/* webpackChunkName: "admin_home" */'@/views/admin/HomeView.vue'),
       meta: {
-        layout: 'auth',
+        layout: 'admin',
+        requiresAuth: true,
       },
       children: [
         {
@@ -99,8 +100,25 @@ const router = createRouter({
           component: () => import(/* webpackChunkName: "option_report" */'@/views/admin/ListReportCommentView.vue'),
         }
       ]
-    }
+    },
   ]
 })
+
+// router.beforeEach((to, from, next) => {
+//   // const isLoggedIn = /* your authentication check here */;
+//   // const isAdmin = /* your authorization check here */;
+
+//   if (to.matched.some(record => record.meta.requiresAuth)) {
+//     if (!isLoggedIn) {
+//       next({ name: 'login' });
+//     } else if (!isAdmin) {
+//       next({ name: 'home' });
+//     } else {
+//       next();
+//     }
+//   } else {
+//     next();
+//   }
+// });
 
 export default router;

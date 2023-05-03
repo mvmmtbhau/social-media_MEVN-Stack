@@ -45,7 +45,8 @@
                 <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-white" />
             </router-link>
 
-            <div class="flex items-center justify-between gap-[10px] py-[15px] cursor-pointer">
+            <div @click="logout()"
+            class="flex items-center justify-between gap-[10px] py-[15px] cursor-pointer">
                 <div class="flex items-center gap-[10px] text-white">
                     <font-awesome-icon :icon="['fas', 'right-from-bracket']" />
                     <p class="text-[14px] leading-[20px] font-normal">Đăng xuất</p>

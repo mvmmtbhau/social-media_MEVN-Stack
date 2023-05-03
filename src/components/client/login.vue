@@ -52,8 +52,13 @@
 import AuthService from "@/services/auth.service";
 import * as yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
+
 import jwt_decode from "jwt-decode";
 import socket from "@/plugins/socket";
+
+import { ref } from "vue";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
 
 export default {
     components: {
@@ -61,7 +66,14 @@ export default {
         Field,
         ErrorMessage,
     },
-    data() {
+    setup () {
+        const store = useStore();
+        const router = useRouter();
+
+        const userName = ref();
+        const password = ref();
+
+
         const loginFormSchema = yup.object().shape({
             userName: yup
                 .string()
@@ -71,30 +83,44 @@ export default {
                 .required("Xin nhập vào trường này")
         });
 
-        return {
-            userName: "",
-            password: "",
-            message: "",
-            loginFormSchema,
-        }
-    },
-    methods: {
-        async handleLogin() {
-            const data = {
-                userName: this.userName,
-                password: this.password,
-            }
-
+        const handleLogin = async () => {
             try {
+                const data = {
+                    userName: userName.value,
+                    password: password.value,
+                }
+
                 const response = await AuthService.login(data);
                 if (response.status === 200) {
-                    localStorage.setItem('access_token', response.data.accessToken);
-                    location.href = '/';
+                    const access_token = response.data.accessToken;
+
+                    localStorage.setItem('access_token', access_token);
+                    
+                    const decodedPayload = jwt_decode(access_token);
+
+                    store.dispatch('auth/handleSetUser', decodedPayload);
+
+                    if(decodedPayload.role == 'admin') {
+                        router.push({
+                            name: 'AdminHome',
+                        })
+                    } else {
+                        router.push({
+                            name: 'Home',                            
+                        })
+                    }
                 }
             } catch (err) {
                 console.log(err);
             }
         }
-    }
+
+        return {
+            handleLogin,
+            userName,
+            password,
+            loginFormSchema,
+        }
+    },
 }
 </script>

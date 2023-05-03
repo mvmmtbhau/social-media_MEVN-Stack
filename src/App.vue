@@ -26,28 +26,31 @@ export default {
     socket.on("getUsers", (data) => {
       console.log(data);
     })
-    
+
     const getCurrentUser = async () => {
-      const access_token = localStorage.getItem("access_token") || "";
+      const accessToken = localStorage.getItem('access_token') || null;
+      if(accessToken) {
+        const decoded = jwt_decode(accessToken);
 
-      if (access_token) {
-        const decodedHeader = jwt_decode(access_token);
-        store.dispatch("auth/handleSetUser", decodedHeader);
+        store.dispatch('auth/handleSetUser', decoded);
 
-        if (store.state.auth.user) {
-          getConversations(store.state.auth.user._id);
-
-          socket.emit("addUser", store.state.auth.user?._id);
-        }
-
-        if (location.pathname == '/login' || location.pathname == '/register') {
+        if((store.state.auth.user?.role == 'user') && (location.pathname == '/login' || location.pathname == '/register') ) {
           router.push({
             name: 'Home',
+          });
+          getConversations(store.state.auth.user?._id);
+        }
+
+        if(store.state.auth.user?.role == 'admin') {
+          router.push({
+            name: 'AdminHome',
           })
-        };
+        }
       }
 
-      if (!access_token || store.state.auth.user == null) {
+      if(!accessToken || !store.state.auth.user) {
+        store.dispatch('auth/handleSetUser', null);
+
         router.push({
           name: 'Login',
         })

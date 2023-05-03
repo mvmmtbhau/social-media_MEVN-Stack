@@ -11,15 +11,26 @@
 
 <script>
 import sidebarNavigation from '@/components/client/navigation.vue';
-import { onUnmounted } from 'vue';
+import { onBeforeMount, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 export default {
     components: {
         sidebarNavigation,
     },
     setup() {
-        onUnmounted(() => {
-            
+        const store = useStore();
+        const router = useRouter();
+
+        onBeforeMount(() => {
+            if(store.state.auth.user && store.state.auth.user?.role == 'admin') {
+                alert('Xin dùng tài khoản khác');
+                store.dispatch('auth/handleSetUser', null);
+                router.push({
+                    name: 'Login',
+                })
+            }
         })
     },
 }

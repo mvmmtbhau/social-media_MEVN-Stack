@@ -10,4 +10,9 @@ export function registerGlobalComponent(app) {
         'default-layout',
         defineAsyncComponent(() => import('@/layouts/Default.vue')
         ));
+
+    app.component(
+        'admin-layout',
+        defineAsyncComponent(() => import('@/layouts/Admin.vue')
+        ));
 }
