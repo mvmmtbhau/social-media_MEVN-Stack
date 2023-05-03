@@ -272,6 +272,9 @@ class AuthService {
                 _id: {
                     $nin: newArr,
                     $ne: userId,
+                },
+                role: {
+                    $ne: 'admin'
                 }
             }).populate({
                 path: 'follows',

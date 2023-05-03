@@ -26,6 +26,10 @@ const UserSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    role: {
+      type: String,
+      default: 'user',  
+    },
     posts: [
         {
             type: mongoose.Types.ObjectId,
