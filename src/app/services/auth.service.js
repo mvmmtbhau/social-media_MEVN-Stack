@@ -84,7 +84,9 @@ class AuthService {
             }, {
                 userName: 0,
                 password: 0,
-            }).populate('posts')
+            })
+                .populate('savedPosts')
+                .populate('posts')
                 .populate({
                     path: 'follows',
                     populate: {

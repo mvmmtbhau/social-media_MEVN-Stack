@@ -5,7 +5,7 @@ const isAuthentication = (req, res, next) => {
   try {
     const bearerHeader = req.headers["authorization"];
     const access_token = bearerHeader.split(" ")[1];
-    // console.log(access_token);
+
     const decodeJwt = jwt.verify(
       access_token,
       process.env.SECRET_JWT
