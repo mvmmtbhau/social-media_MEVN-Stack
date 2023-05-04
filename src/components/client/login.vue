@@ -92,10 +92,10 @@ export default {
 
                 const response = await AuthService.login(data);
                 if (response.status == 200) {
-                    const access_token = response.data.accessToken;
+                    const access_token = await response.data.accessToken;
 
-                    localStorage.setItem('accessToken', access_token);
-                    
+                    localStorage.setItem("token_of_hau", access_token);
+
                     const decodedPayload = jwt_decode(access_token);
 
                     store.dispatch('auth/handleSetUser', decodedPayload);

@@ -21,14 +21,16 @@ export default {
     const store = useStore();
     const router = useRouter();
 
-    socket.connect();
+    socket?.connect();
 
-    socket.on("getUsers", (data) => {
+    socket?.on("getUsers", (data) => {
       console.log(data);
     })
 
+    socket?.emit('addUser', store.state.auth.user?._id);
+
     const getCurrentUser = async () => {
-      const accessToken = localStorage.getItem('accessToken') || null;
+      const accessToken = localStorage.getItem("token_of_hau") || null;
       if (accessToken) {
         const decoded = jwt_decode(accessToken);
         

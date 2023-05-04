@@ -200,7 +200,7 @@ export default {
         }
 
         const handleLogOut = () => {
-            localStorage.removeItem('access_token');
+            localStorage.removeItem('accessToken');
             store.dispatch('auth/handleSetUser', null);
             router.push('/login');
             socket.on("disconnected");

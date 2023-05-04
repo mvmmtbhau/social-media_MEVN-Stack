@@ -1,7 +1,6 @@
 import axios from "axios";
 
-
-axios.defaults.headers.common["Authorization"] = `Bearer ${localStorage.getItem("accessToken")}`;
+axios.defaults.headers.common["authorization"] = `Bearer ${localStorage.getItem('token_of_hau')}`;
 
 const instance = axios.create({
     baseURL: 'http://localhost:3000/api',
@@ -32,7 +31,7 @@ instance.interceptors.response.use(
       const response = error?.response;
       if (response.status === 401) {
         window.location.href ="/login";
-        localStorage.removeItem('accessToken');
+        localStorage.removeItem("token_of_hau");
         return Promise.reject(error);
       }
       if (response.status === 403) {
