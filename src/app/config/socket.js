@@ -32,6 +32,8 @@ const createSocketIO = (httpServer) => {
 
     io.on("connect", (socket) => {
         socket.on("addUser", async (userId) => {
+            console.log(userId);
+
             if (userId) {
                 addUser(userId, socket.id);
             }

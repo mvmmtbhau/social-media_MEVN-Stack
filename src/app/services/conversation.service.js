@@ -48,7 +48,6 @@ class ConversationService {
     }
 
     async getById(req, res, next) {
-        console.log(req.params);
         try {
             const conversation = await Conversation.findById(
                 req.params.conversationId
