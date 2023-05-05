@@ -2,34 +2,19 @@ const { Conversation } = require('../models/');
 const mongoose = require('mongoose');
 
 class ConversationService {
-    async create(req, res, next) {
-        const { receiver, sender } = req.body;
-        try {
-            const isExist = await Conversation.findOne({
-                $or: [
-                    {
-                        userOne: sender,
-                        userTwo: receiver
-                    },
-                    {
-                        userOne: receiver,
-                        userTwo: sender
-                    }
-                ]
-            });
+    async create(sender, receiver) {
+        const conversation = new Conversation({
+            userOne: sender,
+            userTwo: receiver
+        });
 
-            if (isExist) return res.status(202).send(isExist);
+        return conversation.save();
+    }
 
-            const conversation = new Conversation({
-                userOne: sender,
-                userTwo: receiver
-            });
-
-            const result = conversation.save();
-            return res.status(201).send(result);
-        } catch (err) {
-            return res.status(500).send(err);
-        }
+    async findOne(filter) {
+        return await Conversation
+        .findOne(filter)
+        .populate('userOne', '-userName -password').populate('userTwo', '-userName -password').populate('hasMessages');
     }
 
     async getByUserId(req, res, next) {
@@ -39,7 +24,7 @@ class ConversationService {
                     { userOne: req.params.userId },
                     { userTwo: req.params.userId },
                 ]
-            }).populate('userOne', '-userName -password').populate('userTwo', '-userName -password');
+            }).populate('userOne', '-userName -password').populate('userTwo', '-userName -password').populate('hasMessages').sort({updatedAt: 'desc'});
 
             return res.status(200).send(conversations);
         } catch (err) {

@@ -20,6 +20,7 @@ const UserSchema = new Schema({
     },
     gender: {
         type: Number,
+        default: 0,
     },
     avatar: '',
     private: {

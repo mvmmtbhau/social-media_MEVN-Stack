@@ -32,8 +32,6 @@ const createSocketIO = (httpServer) => {
 
     io.on("connect", (socket) => {
         socket.on("addUser", async (userId) => {
-            console.log(userId);
-
             if (userId) {
                 addUser(userId, socket.id);
             }
@@ -43,11 +41,16 @@ const createSocketIO = (httpServer) => {
 
         socket.on("sendMessage", async (data) => {
             const user = await getUser(data.receiver);
+            const sender = await getUser(data.sender);
+
+            console.log(data.sender);
 
             const message = {
                 message: data.message,
                 sender: data.sender
             }
+            
+            io.to(sender?.socketId).emit("senderSend", message);
             
             if (user && user.socketId) {
                 io.to(user?.socketId).emit("getMessage", message);
@@ -69,8 +72,6 @@ const createSocketIO = (httpServer) => {
         });
 
         socket.on("createPost", async (data) => {
-            console.log(data);
-
             const user = await getUser(data.owner._id);
             if (user && user.socketId) {
                 io.to(user.socketId).emit("getPost", data);
@@ -101,17 +102,17 @@ const createSocketIO = (httpServer) => {
             }
         })
 
-        socket.on('deletePost', async (userId) => {
-            const user = await getUser(userId);
+        socket.on('deletePost', async (data) => {
+            const user = await getUser(data.userId);
             if(user && user.socketId) {
-                io.to(user.socketId).emit('deletePost');
+                io.to(user.socketId).emit('deletePost', data.postId);
             }
         })
 
-        socket.on('reportPost', async (userId) => {
-            const user = await getUser(userId);
+        socket.on('reportPost', async (data) => {
+            const user = await getUser(data.userId);
             if(user && user.socketId) {
-                io.to(user.socketId).emit('reportPost');
+                io.to(user.socketId).emit('reportPost', data.postId);
             }
         })
 

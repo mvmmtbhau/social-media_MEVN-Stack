@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 
 const likeController = require('../controllers/like.controller');
+const { isAuthentication } = require('../middlewares/auth.middleware');
 
-router.post('/post', likeController.likePost);
+router.post('/post',[isAuthentication], likeController.likePost);
 
-router.delete('/post/unlike/:postId&:userId', likeController.unlikePost);
+router.delete('/post/unlike/:postId&:userId',[isAuthentication], likeController.unlikePost);
 
-router.get('/all/:postId', likeController.getLikesByPostId);
+router.get('/all/:postId',[isAuthentication], likeController.getLikesByPostId);
 
 module.exports = router;

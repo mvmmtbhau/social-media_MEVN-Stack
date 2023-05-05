@@ -3,15 +3,14 @@ const UserModel = require("../models/user.model");
 
 const isAuthentication = async (req, res, next) => {
   try {
-    const bearerHeader = await req.headers.authorization;
+    const bearerHeader = req.headers["authorization"];
     const access_token = bearerHeader.split(" ")[1];
 
     const decodeJwt = jwt.verify(
       access_token,
       process.env.SECRET_JWT
     );
-
-    // console.log("check auth");
+    
     req.userId = decodeJwt._id; //gán id cho req sau
     next();
   } catch (e) {

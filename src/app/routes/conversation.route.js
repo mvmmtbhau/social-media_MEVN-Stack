@@ -4,10 +4,9 @@ const router = express.Router();
 const conversationController = require('../controllers/conversation.controller');
 const { isAuthentication } = require('../middlewares/auth.middleware');
 
-router.post('/create', conversationController.createConversation);
+router.post('/create', [isAuthentication], conversationController.createConversation);
 
-
-router.get('/:conversationId', conversationController.getConversationById);
-router.get('/all/:userId', conversationController.getConversationsByUserId);
+router.get('/:conversationId', [isAuthentication], conversationController.getConversationById);
+router.get('/all/:userId', [isAuthentication], conversationController.getConversationsByUserId);
 
 module.exports = router;

@@ -2,14 +2,14 @@ const { Conversation, Message } = require('../models/');
 const mongoose = require('mongoose');
 
 class MessageService {
-    async send(req, res, next) {
+    async create(data) {
+        try {
         const message = new Message({
-            message: req.body.message,
-            belongConversation: req.body.conversationId,
-            sender: req.body.sender
+            message: data.message,
+            belongConversation: data.conversationId,
+            sender: data.sender
         });
 
-        try {
             const newMessage = await message.save();
             if(newMessage) {
                 const updateConversation = await Conversation.findByIdAndUpdate(
@@ -22,7 +22,7 @@ class MessageService {
                     { new: true, useFindAndModify: false },
                 );
             }
-            return res.status(201).send(newMessage);
+            return newMessage;
         } catch (err) {
             return res.status(500).send(err);
         }

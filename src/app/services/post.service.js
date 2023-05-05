@@ -76,6 +76,7 @@ class MessageService {
 
             return res.status(200).json(posts);
         } catch (err) {
+            console.log(err);
             return res.status(500).send(err);
         }
     }
@@ -117,12 +118,18 @@ class MessageService {
                         userName: 0,
                     }
                 )
+                
+                const deleteReports = await Report.deleteMany({
+                    post: postId,
+                })
+
                 const deletedComments = await Comment.deleteMany({
                     belongToPost: postId,
                 })
                 return res.status(200).send({ deletedPost, updateUser });
             }
         } catch (err) {
+            console.log(err);
             return res.status(500).send(err);
         }
     }

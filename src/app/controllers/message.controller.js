@@ -4,7 +4,14 @@ const ApiError = require('../api-error');
 class MessageController {
     async sendMessage(req, res, next) {
         try {
-            const message = await messageService.send(req, res, next);
+            const data = {
+                message: req.body.message,
+                conversationId: req.body.conversationId,
+                sender: req.body.sender
+            }
+
+            const newMessage = await messageService.create(data);
+            return res.status(201).json(newMessage);
         } catch (err) {
             return next(err);
         }
