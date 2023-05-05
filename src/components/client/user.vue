@@ -267,7 +267,8 @@
         </div>
 
         <div v-if=" isShowFollowingModal " class="fixed z-20">
-            <div class="upload_file_modal flex items-center justify-center relative" @click=" isShowFollowingModal = false ">
+            <div class="upload_file_modal flex items-center justify-center relative"
+                @click=" isShowFollowingModal = false ">
                 <div class="modal bg-white h-[25rem] rounded-[0.6rem] w-[25rem]" @click.stop>
                     <div class="relative py-3 border-b-2 text-center">
                         <span class="font-[600]">Đang theo dõi</span>
@@ -276,7 +277,7 @@
                     </div>
                     <div class="overflow-y-scroll overflow-x-hidden h-[21rem]">
                         <div class="relative flex gap-3 px-4 py-2 items-center w-full"
-                            v-for=" following  in  this.$store.state.auth.userById?.follows.filter(follow => follow.state == true) "
+                            v-for="    following     in     this.$store.state.auth.userById?.follows.filter(follow => follow.state == true)    "
                             :key=" following ">
                             <router-link :to="
                                 {
@@ -310,13 +311,11 @@
                             </div>
                             <div class="absolute right-4"
                                 v-if=" this.$store.state.auth.user?._id != following.followUser._id ">
-                                <span
-                                    v-if="
-                                        !this.$store.state.auth.user?.follows.length
+                                <span v-if="
+                                    !this.$store.state.auth.user?.follows.length
                                         || this.$store.state.auth.user?.follows.length
                                         && !this.$store.state.auth.user?.follows.some(follow => follow.followUser._id == following.followUser._id)
-                                    "
-                                    @click=" followUser(this.$store.state.auth.user?._id, following.followUser) "
+                                " @click=" followUser(this.$store.state.auth.user?._id, following.followUser) "
                                     class=" right-4 text-sm text-white bg-cyan-500 py-1 px-2 font-bold cursor-pointer hover:bg-cyan-600 rounded-md">
                                     Theo dõi
                                 </span>
@@ -375,7 +374,7 @@
                     </div>
                     <div class="overflow-y-scroll overflow-x-hidden h-[21rem]">
                         <div class="relative flex gap-3 px-4 py-2 items-center w-full"
-                            v-for=" request  in  this.$store.state.auth.userById?.hasFollowers.filter(follow => follow.state == false) "
+                            v-for="    request     in     this.$store.state.auth.userById?.hasFollowers.filter(follow => follow.state == false)    "
                             :key=" request ">
                             <router-link :to="
                                 {
@@ -383,7 +382,8 @@
                                         params: { id: request.fromUser._id }
                                 }
                             " class="rounded-full">
-                                <img v-if=" request.fromUser?.avatar " :src=" publicImage + request.fromUser.avatar.filename "
+                                <img v-if=" request.fromUser?.avatar "
+                                    :src=" publicImage + request.fromUser.avatar.filename "
                                     class="w-12 h-12 rounded-full cursor-pointer">
                                 <img v-else src="../../assets/images/no-avatar.jfif"
                                     class="w-12 h-12 rounded-full cursor-pointer">
@@ -421,6 +421,28 @@
                 </div>
             </div>
         </div>
+        <div v-if=" isShowSendMessageModal " class="fixed z-20">
+            <div class="upload_file_modal flex items-center justify-center relative"
+                @click=" isShowSendMessageModal = false ">
+                <div class="modal bg-white rounded-[0.6rem] w-[25rem]" @click.stop>
+                    <div class="relative py-3 border-b-2 text-center flex flex-col">
+                        <span class="font-[600]">Gửi tin nhắn cho: {{ this.$store.state.auth.userById?.fullName }}</span>
+                        <font-awesome-icon icon="fa-solid fa-xmark" class="absolute right-3 text-2xl cursor-pointer"
+                            @click=" isShowSendMessageModal = false " />
+                        <span class="text-red text-sm" id="errorMessage"></span>
+                    </div>
+                    <div class="py-2 px-2">
+                        <div class="px-2 py-2 border-2 rounded-xl w-full">
+                            <input v-model=" message "
+                                @keydown.enter=" message ? createChatBoxAndSendMessage(this.$store.state.auth.user?._id, this.$store.state.auth.userById?._id) : messageEmpty() " type="text"
+                                class="text-sm px-2 w-[90%]" placeholder="Nội dung gửi..">
+                            <font-awesome-icon @click=" message ? createChatBoxAndSendMessage(this.$store.state.auth.user?._id, this.$store.state.auth.userById?._id) : messageEmpty() "
+                                icon="fa-solid fa-paper-plane" class="text-xl cursor-pointer hover:scale-105" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </template>
 
@@ -443,6 +465,7 @@ export default {
 
         const userId = ref();
         const follower = ref();
+        const message = ref();
 
         const isShowPosts = ref(true);
         const isShowFollowersModal = ref(false);
@@ -450,6 +473,7 @@ export default {
         const isShowRequestModal = ref(false);
         const isShowDeleteFollowerModal = ref(false);
         const isShowDeleteFollowingModal = ref(false);
+        const isShowSendMessageModal = ref(false);
 
         const {
             getUserById,
@@ -466,20 +490,60 @@ export default {
         })
 
         const handleCreateConversation = async (sender, receiver) => {
-            const data = {
-                receiver,
-                sender,
-            }
-            console.log(data);
-
             try {
-                const response = await conversationService.createConversation(data);
-                if (response.status == 201 || response.status == 202) {
-                    console.log('Tạo hoặc đã có conversation: ', response.status);
-                    console.log('Conversation:', response.data);
+                const data = {
+                    sender,
+                    receiver,
+                }
+
+                const response = await conversationService.create(data);
+
+                if (response.status == 200) {
+                    router.push({
+                        name: 'ChatBox',
+                        params: { id: response.data._id }
+                    });
+                }
+
+                if (response.status == 202) {
+                    isShowSendMessageModal.value = true;
+                }
+
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        const createChatBoxAndSendMessage = async (sender, receiver) => {
+            try {
+                const data = {
+                    message: message.value,
+                    sender,
+                    receiver,
+                }
+
+                const response = await conversationService.create(data);
+                if (response.status == 201) {
+                    isShowSendMessageModal.value = false;
+                    message.value = '';
+                    router.push({
+                        name: 'ChatBox',
+                        params: { id: response.data._id }
+                    })
                 }
             } catch (err) {
                 console.log(err);
+            }
+        }
+
+        const messageEmpty = () => {
+            if (!message.value) {
+                let errorMessage = document.getElementById('errorMessage');
+                let textEle = document.createElement('p');
+                textEle.id = 'textMessage';
+                let textNode = document.createTextNode('Vui lòng nhập nội dung gửi');
+                textEle.appendChild(textNode);
+                errorMessage.appendChild(textEle);
             }
         }
 
@@ -502,14 +566,24 @@ export default {
             isShowDeleteFollowingModal.value = true;
         }
 
+        watch(message, (newVal, oldVal) => {
+            let textEle = document.getElementById('textMessage');
+            if (textEle) {
+                textEle.remove();
+            }
+        })
+
         return {
             showModal,
             showDeleteModal,
             showDeleteFollowingModal,
+            handleCreateConversation,
+            createChatBoxAndSendMessage,
+            messageEmpty,
+            message,
             followUser,
             unFollowUser,
             updateFollow,
-            handleCreateConversation,
             userId,
             follower,
             publicImage,
@@ -519,6 +593,7 @@ export default {
             isShowRequestModal,
             isShowDeleteFollowerModal,
             isShowDeleteFollowingModal,
+            isShowSendMessageModal,
         }
     },
     data() {

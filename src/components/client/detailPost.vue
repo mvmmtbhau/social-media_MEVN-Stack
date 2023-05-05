@@ -29,7 +29,7 @@
                                         params: { id: this.$store.state.post.post?.owner._id }
                                     }">
                                     <img v-if="this.$store.state.post.post?.owner.avatar"
-                                        :src="publicImage + this.$store.state.post.post?.owner.avatar"
+                                        :src="publicImage + this.$store.state.post.post?.owner.avatar.filename"
                                         class="h-8 w-8 rounded-full">
                                     <img v-else src="../../assets/images/no-avatar.jfif" class="h-8 w-8 rounded-full">
                                 </router-link>
@@ -132,9 +132,8 @@
                                         class="cursor-pointer" />
                                     <font-awesome-icon icon="fa-regular fa-comment" />
                                     <font-awesome-icon icon="fa-solid fa-bookmark" class="absolute right-4 cursor-pointer"
-                                        v-if="this.$store.state.auth.user?.savedPosts.length
-                                            && this.$store.state.auth.user?.savedPosts.length > 0 &&
-                                            this.$store.state.auth.user?.savedPosts.some(id => id == this.$store.state.post.post?._id)"
+                                        v-if="this.$store.state.auth.user?.savedPosts.length 
+                                        && this.$store.state.auth.user?.savedPosts.some(savedPost => savedPost._id == this.$store.state.post.post?._id)"
                                         @click="removeSavedPost(this.$store.state.post.post?._id, this.$store.state.auth.user?._id)" />
                                     <font-awesome-icon v-else icon="fa-regular fa-bookmark"
                                         class="absolute right-4 cursor-pointer"

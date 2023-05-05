@@ -5,7 +5,7 @@ class ConversationService {
         this.api = instance;
     }
 
-    async createConversation(data) {
+    async create(data) {
         return (await this.api.post('/conversation/create',data));
     }
 

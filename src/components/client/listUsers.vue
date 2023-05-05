@@ -4,7 +4,7 @@
             <span>Gợi ý</span>
         </div>
         <div>
-            <div v-if="users.length == 0">
+            <div v-if="users?.length == 0">
                 Hiện tại chưa có gợi ý kết bạn nào.
             </div>
             <div v-else v-for="user in users" :key="user" class="relative flex items-center gap-4 text-sm py-2">

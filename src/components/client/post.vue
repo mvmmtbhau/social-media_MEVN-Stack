@@ -45,8 +45,8 @@
 
                     <font-awesome-icon icon="fa-regular fa-comment" class="cursor-pointer"
                         @click="arriveToPost(post._id)" />
-                    <font-awesome-icon v-if="this.$store.state.auth.user?.savedPosts && this.$store.state.auth.user?.savedPosts.length &&
-                        this.$store.state.auth.user?.savedPosts.some(id => id == post?._id)"
+                    <font-awesome-icon v-if="this.$store.state.auth.user?.savedPosts &&
+                        this.$store.state.auth.user?.savedPosts.some(savedPost => savedPost._id == post?._id)"
                         icon="fa-solid fa-bookmark" class="absolute right-2 cursor-pointer"
                         @click="removeSavedPost(post?._id, this.$store.state.auth.user._id)" />
                     <font-awesome-icon v-else icon="fa-regular fa-bookmark" class="absolute right-2 cursor-pointer"
@@ -145,12 +145,12 @@ export default {
             posts.value = [...posts.value, data]
         })
 
-        socket?.on('deletePost', () => {
-            fetchPosts(store.state.auth.user?._id);
+        socket?.on('deletePost', async (data) => {
+            posts.value = await posts.value.filter(post => post._id != data);
         })
 
-        socket?.on('reportPost', () => {
-            fetchPosts(store.state.auth.user?._id);
+        socket?.on('reportPost', async (data) => {
+            posts.value = await posts.value.filter(post => post._id != data);
         })
 
         return {

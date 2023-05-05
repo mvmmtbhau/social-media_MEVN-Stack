@@ -11,15 +11,6 @@
                      justify-center text-red-500 font-bold border-b-[1px] border-black/[0.3] rounded-tl-[0.6rem] rounded-tr-[0.6rem]">
                         Báo cáo
                     </div>
-                    <div v-if="this.$store.state.auth.user?.follows.some(follow => follow.followUser._id == this.$store.state.post.postAction?.owner._id)"
-                        class="relative flex gap-3 px-4 py-3 items-center w-full cursor-pointer active:bg-gray-200 transition-all duration-100
-                     justify-center text-red-500 font-bold border-b-[1px] border-black/[0.3]">
-                        Bỏ theo dõi
-                    </div>
-                    <div v-else class="relative flex gap-3 px-4 py-3 items-center w-full cursor-pointer active:bg-gray-200 transition-all duration-100
-                     justify-center text-red-500 font-bold border-b-[1px] border-black/[0.3]">
-                        Theo dõi
-                    </div>
                     <div @click="arriveToPost(this.$store.state.post.postAction._id); hiddenModal()" class="relative flex gap-3 px-4 py-3 items-center w-full cursor-pointer active:bg-gray-200 transition-all duration-100
                      justify-center border-b-[1px] border-black/[0.3]">
                         Đi tới bài viết
@@ -70,7 +61,7 @@
                     <div class="relative flex gap-3 px-4 py-3 w-full border-b-[1px] border-black/[0.2]">
                         <span class="font-bold">Tại sao bạn báo cáo bài viết này?</span>
                     </div>
-                    <div v-for="  option   in   options  " :key=" option "
+                    <div v-for="   option    in    options   " :key=" option "
                         @click=" handleReport(this.$store.state.post.postAction._id, this.$store.state.post.commentAction?._id, this.$store.state.auth.user?._id, option._id) "
                         class="relative cursor-pointer flex items-center justify-between gap-3 px-4 py-3 w-full active:bg-gray-200 transition-all duration-100 border-b-[1px] border-black/[0.2]">
                         <span class="text-sm">{{ option.text }}</span>
@@ -149,7 +140,7 @@
                     <div class="relative flex gap-3 px-4 py-3 w-full border-b-[1px] border-black/[0.2]">
                         <span class="font-bold">Tại sao bạn báo cáo bài viết này?</span>
                     </div>
-                    <div v-for="  option   in   options  " :key=" option "
+                    <div v-for="   option    in    options   " :key=" option "
                         @click=" handleReport(this.$store.state.post.postAction?._id, this.$store.state.post.commentAction?._id, this.$store.state.auth.user?._id, option._id) "
                         class="relative cursor-pointer flex items-center justify-between gap-3 px-4 py-3 w-full active:bg-gray-200 transition-all duration-100 border-b-[1px] border-black/[0.2]">
                         <span class="text-sm">{{ option.text }}</span>
@@ -178,9 +169,6 @@
         </div>
     </div>
 </template>
-
-<!-- Bạn không muốn nhìn thấy bình luận này ư? -->
-<!-- Khi nhìn thấy nội dung mình không thích trên Instagram, bạn có thể báo cáo nếu nội dung này vi phạm Nguyên tắc cộng đồng của chúng tôi hoặc xóa người chia sẻ nội dung này khỏi trải nghiệm của bạn. -->
 
 <script>
 import { onBeforeMount, ref, toRef, watch } from 'vue';
@@ -243,13 +231,20 @@ export default {
         const handleDeletePost = async (postId) => {
             const response = await deletePost(postId);
 
-            if (route.name == 'DetailPost') {
-                router.back();
+            if (response.status == 200) {
+                if (route.name == 'DetailPost') {
+                    router.back();
+                }
+                
+                if(route.name == 'Home') {
+                    socket?.emit('deletePost', {
+                        userId: store.state.auth.user?._id,
+                        postId
+                    });
+                }
+
+                hiddenModal();
             }
-
-            socket?.emit('deletePost', store.state.auth.user?._id);
-
-            hiddenModal();
         }
 
         const handleDeleteComment = async (commentId) => {
@@ -269,7 +264,10 @@ export default {
                 }
 
                 postId
-                    ? socket?.emit('reportPost', store.state.auth.user?._id)
+                    ? socket?.emit('reportPost', {
+                        userId: store.state.auth.user?._id,
+                        postId
+                    })
                     : socket?.emit('reportComment', store.state.auth.user?._id)
             }
         }

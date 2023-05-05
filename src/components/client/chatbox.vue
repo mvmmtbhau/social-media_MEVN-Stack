@@ -1,13 +1,29 @@
 <template>
-    <div class="h-full">
+    <div v-if="currentChat" class="h-full">
         <div class="h-full relative">
             <div class="p-4 border-bottom-1">
                 <div class="flex gap-3">
-                    <img src="../../assets/images/image-login.avif" class="h-6 w-6 rounded-full" />
-                    <span class="font-bold" v-if="currentChat?.userOne._id === this.$store.state.auth.user._id">
+                    <img @click="arriveToUser(currentChat.userOne?._id)" v-if="(currentChat.userOne?._id != this.$store.state.auth.user?._id)
+                        && (currentChat.userTwo?._id == this.$store.state.auth.user?._id)
+                        && currentChat.userOne?.avatar" :src="publicImage + currentChat.userOne?.avatar.filename"
+                        class="h-6 w-6 rounded-full cursor-pointer">
+
+                    <img @click="arriveToUser(currentChat.userTwo?._id)" v-if="(currentChat.userTwo?._id != this.$store.state.auth.user?._id)
+                        && (currentChat.userOne?._id == this.$store.state.auth.user?._id)
+                        && currentChat.userTwo?.avatar" :src="publicImage + currentChat.userTwo?.avatar.filename"
+                        class="h-6 w-6 rounded-full cursor-pointer">
+
+                    <img @click="arriveToUser(
+                            (currentChat.userTwo?._id != this.$store.state.auth.user?._id)
+                                && (currentChat.userOne?._id == this.$store.state.auth.user?._id)
+                                ? currentChat.userTwo?._id : currentChat.userOne?._id
+                        )" v-else src="../../assets/images/no-avatar.jfif" class="h-6 w-6 rounded-full cursor-pointer">
+                    <span class="font-bold cursor-pointer"
+                        v-if="currentChat?.userOne._id === this.$store.state.auth.user._id"
+                        @click="arriveToUser(currentChat.userTwo?._id)">
                         {{ currentChat?.userTwo.fullName }}
                     </span>
-                    <span class="font-bold" v-else>
+                    <span class="font-bold cursor-pointer" v-else @click="arriveToUser(current.userOne?._id)">
                         {{ currentChat?.userOne.fullName }}
                     </span>
                 </div>
@@ -55,10 +71,14 @@ import { onBeforeMount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
+import { publicImage } from "@/constants";
+
 import conversationService from "@/services/conversation.service";
 import messageService from "@/services/message.service";
 
 import socket from "@/plugins/socket";
+
+import useUser from "@/uses/useUser";
 
 export default {
     setup() {
@@ -69,6 +89,10 @@ export default {
         const currentChat = ref();
         const message = ref();
         const messages = ref();
+
+        const {
+            arriveToUser,
+        } = useUser();
 
         const fetchChatBox = async (chatBoxId) => {
             try {
@@ -106,6 +130,7 @@ export default {
             socket.emit("sendMessage", {
                 ...data,
                 receiver: receiver._id,
+                sender: store.state.auth.user?._id,
             });
 
             try {
@@ -126,9 +151,11 @@ export default {
 
         return {
             sendMessage,
+            arriveToUser,
             currentChat,
             message,
             messages,
+            publicImage
         }
     }
 }

@@ -1,6 +1,8 @@
 import axios from "axios";
 
-axios.defaults.headers.common["authorization"] = `Bearer ${localStorage.getItem('token_of_hau')}`;
+const token = localStorage.getItem("token_of_hau");
+
+axios.defaults.headers.common["authorization"] = `Bearer ` + token;
 
 const instance = axios.create({
     baseURL: 'http://localhost:3000/api',
@@ -30,6 +32,7 @@ instance.interceptors.response.use(
       const config = error.config;
       const response = error?.response;
       if (response.status === 401) {
+        alert('Phiên đăng nhập kết thúc, xin đăng nhập lại');
         window.location.href ="/login";
         localStorage.removeItem("token_of_hau");
         return Promise.reject(error);

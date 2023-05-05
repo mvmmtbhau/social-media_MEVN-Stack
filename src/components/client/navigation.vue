@@ -44,7 +44,7 @@
                             " class=" text-[0.8]">Khám phá</span>
                     </router-link>
                     <router-link to="/inbox"
-                        class=" hover:bg-gray-50 hover:rounded-3xl hover:translate-x-1 w-48 px-3 py-3 flex gap-4 transition duration-300">
+                        class="relative hover:bg-gray-50 hover:rounded-3xl hover:translate-x-1 w-48 px-3 py-3 flex gap-4 transition duration-300">
                         <font-awesome-icon :icon="[
                                 route.name != 'Inbox'
                                     || (route.name == 'Inbox' &&
@@ -84,7 +84,9 @@
                         <div :class="[
                                 route.name == 'User' ? 'border-[2px] rounded-full border-black' : ''
                             ]">
-                            <img class="w-6 h-6 rounded-full" src="../../assets/images/image-login.avif" alt="">
+                            <img v-if="this.$store.state.auth.user?.avatar" class="w-6 h-6 rounded-full" 
+                            :src="publicImage + this.$store.state.auth.user?.avatar.filename">
+                            <img v-else class="w-6 h-6 rounded-full" src="../../assets/images/no-avatar.jfif">
                         </div>
                         <span :class="[
                                 this.$store.state.modal?.showSearchBox || this.$store.state.modal?.showNotifications ? 'hidden' : '',
@@ -131,10 +133,13 @@ import SearchBox from "@/components/client/searchbox.vue";
 import Notifications from "@/components/client/notifications.vue";
 import actionModal from "@/components/client/actionModal.vue";
 
+import socket from "@/plugins/socket";
+
 import { useStore } from 'vuex';
 import { useRoute, useRouter } from 'vue-router';
-import socket from "@/plugins/socket";
 import { onBeforeMount, ref, watch } from 'vue';
+
+import { publicImage } from "@/constants";
 
 import useUser from '@/uses/useUser';
 import useNoti from '@/uses/useNoti';
@@ -213,6 +218,7 @@ export default {
             updateNotis,
             isShowMore,
             route,
+            publicImage,
         }
     },
 }

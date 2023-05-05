@@ -95,19 +95,15 @@ export default {
                     const access_token = await response.data.accessToken;
 
                     localStorage.setItem("token_of_hau", access_token);
-
+                    
                     const decodedPayload = jwt_decode(access_token);
 
                     store.dispatch('auth/handleSetUser', decodedPayload);
 
                     if(decodedPayload.role == 'admin') {
-                        router.push({
-                            name: 'AdminHome',
-                        })
+                        window.location.href = '/haadminha/'
                     } else {
-                        router.push({
-                            name: 'Home',                            
-                        })
+                        window.location.href = '/'
                     }
                 }
             } catch (err) {

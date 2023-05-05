@@ -4,7 +4,7 @@
             <ListChat class="w-[35%] border-top-1 border-left-1 border-right-1 border-bottom-1" />
             <!-- <ChatBox /> -->
             <div class="w-[65%] border-top-1 border-right-1 border-bottom-1">
-                <div v-if="!true" class="flex h-full flex-col gap-2 items-center justify-center">
+                <div v-if="this.$route.path == '/inbox'" class="flex h-full flex-col gap-2 items-center justify-center">
                     <span class="text-2xl">Tin nhắn của bạn</span>
                     <span class="text-gray-400 text-md">Gửi ảnh và tin nhắn riêng tư cho bạn bè</span>
                     <button type="submit"

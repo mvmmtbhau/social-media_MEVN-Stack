@@ -10,7 +10,17 @@
             <div class="py-2 px-2 hover:bg-white" v-for="conversation in conversations" :key="conversation._id">
                 <div class="flex items-center px-2 py-1 gap-4 cursor-pointer"
                     @click="handleSelectChatbox(conversation._id)">
-                    <img src="../../assets/images/image-login.avif" class="w-14 h-14 rounded-full" />
+                    <img v-if="(conversation.userOne?._id != this.$store.state.auth.user?._id)
+                        && (conversation.userTwo?._id == this.$store.state.auth.user?._id)
+                        && conversation.userOne?.avatar" :src="publicImage + conversation.userOne?.avatar.filename"
+                        class="w-14 h-14 rounded-full">
+
+                    <img v-if="(conversation.userTwo?._id != this.$store.state.auth.user?._id)
+                        && (conversation.userOne?._id == this.$store.state.auth.user?._id)
+                        && conversation.userTwo?.avatar" :src="publicImage + conversation.userTwo?.avatar.filename"
+                        class="w-14 h-14 rounded-full">
+
+                    <img v-else src="../../assets/images/no-avatar.jfif" class="w-14 h-14 rounded-full">
                     <div class="flex flex-col justify-center">
                         <div v-if="conversation.userOne._id === this.$store.state.auth.user._id
                             && conversation.userTwo._id !== this.$store.state.auth.user._id">
@@ -26,11 +36,14 @@
                         </div>
 
                         <div class="flex relative gap-2 text-gray-500">
-                            <span>Tin nhắn</span>
-                            <p class="flex absolute gap-1 -right-16">
-                                <span>-</span>
-                                <span>1 ngày</span>
-                            </p>
+                            <span>
+                                {{
+                                    conversation.hasMessages[conversation.hasMessages.length - 1].message.length > 20
+                                    ? conversation.hasMessages[conversation.hasMessages.length - 1].message.substring(0, 19) +
+                                    '...'
+                                    : conversation.hasMessages[conversation.hasMessages.length - 1].message
+                                }}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -45,6 +58,10 @@ import { onBeforeMount, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useStore } from 'vuex';
 
+import socket from "@/plugins/socket";
+
+import { publicImage } from "@/constants";
+
 import conversationService from "@/services/conversation.service";
 
 export default {
@@ -58,7 +75,7 @@ export default {
         onBeforeMount(() => {
             getConversations(store.state.auth.user?._id);
         })
-        
+
         const getConversations = async (userId) => {
             try {
                 const response = await conversationService.getConversationsByUserId(userId);
@@ -78,10 +95,18 @@ export default {
             })
         }
 
+        socket?.on('senderSend', (data) => {
+            getConversations(store.state.auth.user?._id);
+        })
+
+        socket?.on('getMessage', (data) => {
+            getConversations(store.state.auth.user?._id);
+        })
+
         return {
             handleSelectChatbox,
             conversations,
-
+            publicImage,
         }
     }
 }

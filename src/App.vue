@@ -27,14 +27,14 @@ export default {
       console.log(data);
     })
 
-    socket?.emit('addUser', store.state.auth.user?._id);
-
+    
     const getCurrentUser = async () => {
       const accessToken = localStorage.getItem("token_of_hau") || null;
       if (accessToken) {
         const decoded = jwt_decode(accessToken);
         
         store.dispatch('auth/handleSetUser', decoded);
+        socket?.emit('addUser', store.state.auth.user?._id);
 
         if (store.state.auth.user?.role == 'user' && (location.pathname == '/login' || location.pathname == '/register')) {
           router.push({

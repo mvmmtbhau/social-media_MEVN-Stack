@@ -21,11 +21,10 @@ export default function () {
 
     const getAllPosts = async (userId) => {
         try {
-            return await postService.getAll(userId);
+            const response = await postService.getAll(userId);
+            return response;
         } catch (err) {
-            if (err.response.status === 401) {
-                router.push({ name: "Login" });
-            }
+            console.log(err);
         }
     }
 
@@ -245,8 +244,6 @@ export default function () {
     const deletePost = async (postId) => {
         try {
             const response = await postService.deletePost(postId);
-            await getAllPosts(store.state.auth.user?._id);
-
             return response;
         } catch (err) {
             return err.response;
