@@ -5,7 +5,9 @@
             <span class="text-2xl px-6 py-8 font-bold">Tìm kiếm</span>
             <div class="relative bg-gray-100 border-2 w-[90%] mx-auto pl-3 py-2 rounded-md">
                 <input type="text" v-model="searchText" class="w-full" placeholder="Tìm kiếm">
-                <span @click="searchText = ''" class="absolute right-4 cursor-pointer">Xóa</span>
+                <span @click="searchText = ''" class="absolute right-4 cursor-pointer">
+                    <font-awesome-icon  icon="fa-solid fa-xmark" />
+                </span>
             </div>
         </div>
         <div v-if="searchResult" class="flex flex-col h-[80%] overflow-y-scroll">
@@ -53,7 +55,7 @@
                             <p>Đang theo dõi</p>
                         </span>
                     </div>
-                    <font-awesome-icon @click="handleRemove(history, index)" icon="fa-solid fa-xmark"
+                    <font-awesome-icon @click.stop="handleRemove(history, index)" icon="fa-solid fa-xmark"
                         class="absolute right-8 text-2xl text-gray-400" />
                 </div>
             </div>

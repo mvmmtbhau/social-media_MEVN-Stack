@@ -90,7 +90,7 @@ export default {
         } = useUser();
 
         onBeforeMount(async () => {
-            await getUsers(store.state.auth.user?._id);
+            await getUsers(store.state.auth.user?._id, 20);
         })
 
         const showDeleteFollowingModal = (following) => {

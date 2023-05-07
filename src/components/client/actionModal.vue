@@ -224,10 +224,6 @@ export default {
             }
         }
 
-        watch(() => route.name, () => {
-            console.log(`Current route: ${route.name}`);
-        })
-
         const handleDeletePost = async (postId) => {
             const response = await deletePost(postId);
 

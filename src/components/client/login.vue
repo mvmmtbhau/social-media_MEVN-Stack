@@ -6,9 +6,9 @@
                 <!-- Form -->
                 <div class="md:w-1/2 px-16">
                     <h2 class="font-bold text-2xl text-[#002d74]">Login</h2>
-                    <p class="text-sm mt-4 text-[#002d74]">If you already a member, easily log in</p>
-
-                    <Form class="flex flex-col gap-4" @submit="handleLogin" :validation-schema="loginFormSchema">
+                    <p class="text-sm mt-4 mb-4 text-[#002d74]">If you already a member, easily log in</p>
+                    <span class="break-words w-2 text-red-500" id="errorMessage"></span>
+                    <Form class="flex flex-col gap-4" @submit="handleLogin" :validation-schema="loginFormSchema" autocomplete="off">
                         <div>
                             <Field class="p-2 rounded-xl border mt-8 w-full " type="text" name="userName"
                                 placeholder="Tên đăng nhập" v-model="userName" />
@@ -22,18 +22,8 @@
                         </div>
                         <button class="bg-[#002d74] rounded-xl text-white py-2">Log in</button>
                     </Form>
-                    <div class="mt-10 grid grid-cols-3 items-center text-gray-500">
-                        <hr class="border-gray-500">
-                        <p class="text-center text-sm">OR</p>
-                        <hr class="border-gray-500">
-                    </div>
 
-                    <button class="bg-white border py-2 w-full rounded-xl mt-5 flex justify-center items-center">
-                        <!-- <span class="mr-3 text-sm">icon</span> -->
-                        Login with Google
-                    </button>
-
-                    <p class="mt-10 text-xs border-b py-6">Forgot your password?</p>
+                    <p class="mt-20 mb-10 text-xs border-b py-6">Forgot your password?</p>
                     <div class="text-sm flex justify-between items-center">
                         <p>Don't have an account?</p>
                         <router-link to="/register" class="py-2 px-4 bg-white border rounded-xl">Register</router-link>
@@ -56,7 +46,7 @@ import { Form, Field, ErrorMessage } from "vee-validate";
 import jwt_decode from "jwt-decode";
 import socket from "@/plugins/socket";
 
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useStore } from "vuex";
 import { useRouter } from "vue-router";
 
@@ -101,15 +91,32 @@ export default {
                     store.dispatch('auth/handleSetUser', decodedPayload);
 
                     if(decodedPayload.role == 'admin') {
-                        window.location.href = '/haadminha/'
+                        window.location.href = '/haadminha/option_reports'
                     } else {
                         window.location.href = '/'
                     }
                 }
             } catch (err) {
-                console.log(err);
+                if(err.response.status == 400) {
+                    let errDiv = document.getElementById('errorMessage');
+                    let errorText = document.createElement('p');
+                    errorText.id = 'errorText';
+                    let textNode = document.createTextNode(err.response.data);
+                    errorText.appendChild(textNode);
+                    errDiv.appendChild(errorText);
+                }
             }
         }
+
+        watch(userName, (newVal, oldVal) => {
+            let errorText = document.getElementById('errorText');
+            if(errorText) errorText.remove();
+        })
+
+        watch(password, (newVal, oldVal) => {
+            let errorText = document.getElementById('errorText');
+            if(errorText) errorText.remove();
+        })
 
         return {
             handleLogin,

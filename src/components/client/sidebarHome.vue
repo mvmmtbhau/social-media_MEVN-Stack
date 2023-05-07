@@ -106,7 +106,7 @@ export default {
         }
 
         onBeforeMount(async () => {
-           await getUsers(store.state.auth.user?._id);
+           await getUsers(store.state.auth.user?._id, 5);
         })
 
         return {

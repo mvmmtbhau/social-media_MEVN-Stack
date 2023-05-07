@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section v-if="posts?.length > 0">
         <div class="post mb-5 border-2 px-2 py-2 shadow-xl" v-for="(post, index) in posts" :key="index">
             <div class="post-top relative flex items-center gap-2 text-sm py-4 px-2">
                 <router-link v-if="post.owner?._id" :to="{
@@ -29,7 +29,7 @@
                                 <img v-if="image.mimetype != 'video/mp4'" :src="publicImage + image.filename"
                                     class="h-full w-full object-contain">
                                 <video v-else :src="publicImage + image.filename"
-                                    class="h-full w-full object-contain video_div" autoplay muted loop controls></video>
+                                    class="h-full w-full object-contain" autoplay muted loop controls></video>
                             </div>
                         </v-sheet>
                     </v-carousel-item>
@@ -65,6 +65,9 @@
             </div>
         </div>
     </section>
+    <section v-else class="mt-20">
+        <p>Chưa có bài viết nào, hãy đăng thêm bài viết mới nào</p>
+    </section>
 </template>
 
 <script>
@@ -88,10 +91,6 @@ export default {
         const posts = ref();
 
         const {
-            getUserById,
-        } = useUser();
-
-        const {
             getAllPosts,
             likePostInPosts,
             unLikePostInPosts,
@@ -109,12 +108,12 @@ export default {
         }
 
         onBeforeMount(async () => {
-            getUserById(store.state.auth.user?._id);
             fetchPosts(store.state.auth.user?._id);
         })
 
         const handleLike = async (postId, userId, index) => {
-            const response = likePostInPosts(postId, userId);
+            const response = await likePostInPosts(postId, userId);
+            console.log(response);
             if (response.status == 201) {
                 posts.value[index].likes = [
                     ...posts.value[index].likes,

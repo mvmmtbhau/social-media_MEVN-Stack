@@ -13,9 +13,11 @@
                                     <v-carousel-item v-for="image in this.$store.state.post.post?.images" :key="image">
                                         <v-sheet class="h-full w-full bg-cyan-500" tile>
                                             <div class="h-full w-full">
-                                                <img v-if="image.mimetype != 'video/mp4'" :src="publicImage + image.filename"
+                                                <img v-if="image.mimetype != 'video/mp4'"
+                                                    :src="publicImage + image.filename"
                                                     class="h-full w-full object-contain">
-                                                <video v-else :src="publicImage + image.filename" autoplay controls muted preload class="h-full w-full object-contain"></video>
+                                                <video v-else :src="publicImage + image.filename" autoplay controls muted
+                                                    preload class="h-full w-full object-contain"></video>
                                             </div>
                                         </v-sheet>
                                     </v-carousel-item>
@@ -25,30 +27,31 @@
                         <div class="modal_content w-6/12 relative">
                             <div class="flex items-center gap-4 p-4 border-bottom-1 relative">
                                 <router-link :to="{
-                                        name: 'User',
-                                        params: { id: this.$store.state.post.post?.owner._id }
-                                    }">
+                                    name: 'User',
+                                    params: { id: this.$store.state.post.post?.owner._id }
+                                }">
                                     <img v-if="this.$store.state.post.post?.owner.avatar"
                                         :src="publicImage + this.$store.state.post.post?.owner.avatar.filename"
                                         class="h-8 w-8 rounded-full">
                                     <img v-else src="../../assets/images/no-avatar.jfif" class="h-8 w-8 rounded-full">
                                 </router-link>
                                 <router-link :to="{
-                                        name: 'User',
-                                        params: { id: this.$store.state.post.post?.owner._id }
-                                    }" class="font-bold text-sm outline-1">
+                                    name: 'User',
+                                    params: { id: this.$store.state.post.post?.owner._id }
+                                }" class="font-bold text-sm outline-1">
                                     {{ this.$store.state.post.post?.owner.fullName }}
                                 </router-link>
-                                <font-awesome-icon @click="showActionModal(this.$store.state.post.post)" 
-                                icon="fa-solid fa-ellipsis" class="absolute right-8 cursor-pointer text-xl hover:text-gray-400" />
+                                <font-awesome-icon @click="showActionModal(this.$store.state.post.post)"
+                                    icon="fa-solid fa-ellipsis"
+                                    class="absolute right-8 cursor-pointer text-xl hover:text-gray-400" />
                             </div>
                             <div class="p-4 text-sm max-w-full max-h-[65%] overflow-auto">
                                 <div class="w-full flex flex-col gap-4">
                                     <div class="w-[90%] grid grid-cols-12 relative">
                                         <router-link :to="{
-                                                name: 'User',
-                                                params: { id: this.$store.state.post.post?.owner._id }
-                                            }">
+                                            name: 'User',
+                                            params: { id: this.$store.state.post.post?.owner._id }
+                                        }">
                                             <img v-if="this.$store.state.post.post?.owner.avatar"
                                                 :src="publicImage + this.$store.state.post.post?.owner.avatar.filename"
                                                 class="h-8 w-8 rounded-full object-cover col-auto">
@@ -57,9 +60,9 @@
                                         </router-link>
                                         <div class="flex flex-col gap-1 w-full col-span-10">
                                             <router-link :to="{
-                                                    name: 'User',
-                                                    params: { id: this.$store.state.post.post?.owner._id }
-                                                }" class="font-bold">
+                                                name: 'User',
+                                                params: { id: this.$store.state.post.post?.owner._id }
+                                            }" class="font-bold">
                                                 {{ this.$store.state.post.post?.owner.fullName }}
                                             </router-link>
                                             <div class="break-words w-[90%]">
@@ -86,9 +89,9 @@
                                             @click="likeComment(comment._id, this.$store.state.auth.user._id, index)" />
 
                                         <router-link :to="{
-                                                name: 'User',
-                                                params: { id: comment?.owner._id }
-                                            }">
+                                            name: 'User',
+                                            params: { id: comment?.owner._id }
+                                        }">
                                             <img v-if="comment?.owner.avatar"
                                                 :src="publicImage + comment?.owner.avatar.filename"
                                                 class="h-8 w-8 rounded-full object-cover col-auto">
@@ -98,9 +101,9 @@
 
                                         <div class="flex flex-col gap-1 w-full col-span-10">
                                             <router-link :to="{
-                                                    name: 'User',
-                                                    params: { id: comment?.owner._id }
-                                                }" class="font-bold w-fit">
+                                                name: 'User',
+                                                params: { id: comment?.owner._id }
+                                            }" class="font-bold w-fit">
                                                 {{ comment?.owner.fullName }}
                                             </router-link>
                                             <div class="break-words w-[90%]">
@@ -132,8 +135,8 @@
                                         class="cursor-pointer" />
                                     <font-awesome-icon icon="fa-regular fa-comment" />
                                     <font-awesome-icon icon="fa-solid fa-bookmark" class="absolute right-4 cursor-pointer"
-                                        v-if="this.$store.state.auth.user?.savedPosts.length 
-                                        && this.$store.state.auth.user?.savedPosts.some(savedPost => savedPost._id == this.$store.state.post.post?._id)"
+                                        v-if="this.$store.state.auth.user?.savedPosts.length
+                                            && this.$store.state.auth.user?.savedPosts.some(savedPost => savedPost._id == this.$store.state.post.post?._id)"
                                         @click="removeSavedPost(this.$store.state.post.post?._id, this.$store.state.auth.user?._id)" />
                                     <font-awesome-icon v-else icon="fa-regular fa-bookmark"
                                         class="absolute right-4 cursor-pointer"
@@ -156,7 +159,7 @@
                                         @keydown.enter.exact="commentPost(comment, this.$store.state.post.post._id, this.$store.state.auth.user._id); comment = ''"
                                         class="py-2 w-[80%] break-word" placeholder="Thêm bình luận">
                                     <span class="px-2 cursor-pointer text-cyan-500 font-bold"
-                                        @click=" commentPost(this.$store.state.post.post._id, this.$store.state.auth.user._id) ">Đăng</span>
+                                        @click=" commentPost(this.$store.state.post.post._id, this.$store.state.auth.user._id)">Đăng</span>
                                 </div>
                             </div>
                         </div>
@@ -186,6 +189,8 @@ export default {
         const router = useRouter();
         const route = useRoute();
 
+        const prevUrl = ref();
+
         const showMoreOptions = ref(false);
 
         const {
@@ -213,9 +218,10 @@ export default {
             await getCommentsByPostId(postId.value, store.state.auth.user?._id);
             const response = await getPostById(postId.value, store.state.auth.user?._id);
             if (response.status && response.status == 404) {
+                alert(response.data.message);
                 closeModal();
             }
-        })
+        });
 
         const closeModal = () => {
             router.back();
@@ -224,9 +230,9 @@ export default {
         }
 
         const showActionModal = async (data) => {
-            data._id == route.params.id 
-            ? store.dispatch('post/handleSetPostAction', data)
-            : store.dispatch('post/handleSetCommentAction', data);
+            data._id == route.params.id
+                ? store.dispatch('post/handleSetPostAction', data)
+                : store.dispatch('post/handleSetCommentAction', data);
             store.dispatch('modal/handleShowActionModal', true);
         }
 

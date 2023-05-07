@@ -33,9 +33,9 @@ export default function () {
         }
     }
 
-    const getUsers = async (userId) => {
+    const getUsers = async (userId, limit) => {
         try {
-            const response = await authService.getUsers(userId);
+            const response = await authService.getUsers(userId, limit);
             if (response.status === 200) {
                 fetchCurrentUser(store.state.auth.user?._id);
 
@@ -69,9 +69,14 @@ export default function () {
     const unFollowUser = async (fromUser, followUser) => {
         try {
             const response = await followService.unFollow(fromUser, followUser);
-            if (response.status == 200 || response.status == 204) {
-                fetchCurrentUser(fromUser);
-                getUserById(followUser);
+            if (response.status == 200) {
+                if (store.state.auth.user?._id == followUser) {
+                    fetchCurrentUser(followUser);
+                    getUserById(followUser);
+                } else {
+                    fetchCurrentUser(fromUser);
+                    getUserById(followUser);
+                }
             }
         } catch (err) {
             console.log(err);

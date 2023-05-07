@@ -37,7 +37,9 @@
                         </div>
                         <div class="modal_content w-5/12 px-4 ">
                             <div class="flex items-center gap-4 py-4">
-                                <img src="../../assets/images/image-login.avif" class="h-8 w-8 rounded-full">
+                                <img v-if="this.$store.state.auth.user?.avatar" 
+                                :src="publicImage + this.$store.state.auth.user?.avatar.filename" class="h-8 w-8 rounded-full">
+                                <img v-else src="../../assets/images/no-avatar.jfif" class="h-8 w-8 rounded-full">
                                 <span class="font-bold text-sm outline-1">
                                     {{ this.$store.state.auth.user.fullName }}
                                 </span>
@@ -66,6 +68,8 @@ import postService from "@/services/post.service";
 import socket from "@/plugins/socket";
 import { watch } from 'vue';
 
+import { publicImage} from "@/constants";
+
 export default {
     name: "createPost",
     components: {
@@ -85,6 +89,19 @@ export default {
 
         const createPost = async () => {
             try {
+                let errorMessage = document.getElementById('error_message');
+                const ele = document.getElementById('error_text');
+                if (ele) ele.remove();
+
+                if (!images.value || images.value.length == 0) {
+                    let errorText = document.createElement('p');
+                    errorText.id = 'error_text';
+                    let textNode = document.createTextNode('Bài viết ít nhất phải có ảnh hoặc video');
+                    errorText.appendChild(textNode);
+                    errorMessage.appendChild(errorText);
+                    return;
+                }
+
                 const formData = new FormData();
                 if (images.value.length > 0) {
                     images.value.forEach(image =>
@@ -107,7 +124,7 @@ export default {
             let divWrap = document.getElementById('showImages');
             let errorMessage = document.getElementById('error_message');
             const ele = document.getElementById('error_text');
-            if(ele) {
+            if (ele) {
                 ele.remove();
             }
 
@@ -115,8 +132,8 @@ export default {
             for (let i = 0; i < images.value.length; i++) {
                 let typeFile = images.value[i].type;
                 const arr = typeFile.split('/');
-                
-                if(arr[1] == 'mp4' || arr[1] == 'png' || arr[1] == 'jpeg' || arr[1] == 'jpg') {
+
+                if (arr[1] == 'mp4' || arr[1] == 'png' || arr[1] == 'jpeg' || arr[1] == 'jpg') {
                 } else {
                     let errorText = document.createElement('p');
                     errorText.id = 'error_text';
@@ -127,14 +144,14 @@ export default {
                     return;
                 }
 
-                if(images.value[i].size >= 1024*1000*5) {
+                if (images.value[i].size >= 1024 * 1000 * 5) {
                     let errorText = document.createElement('p');
                     errorText.id = 'error_text';
                     let textNode = document.createTextNode('Ảnh hoặc video tối đa 5MB');
                     errorText.appendChild(textNode);
                     errorMessage.appendChild(errorText);
-                    images.value = images.value.filter(image => image.size >= 1024*1000*5);
-                    if(images.value.length = 0) images.value = '';
+                    images.value = images.value.filter(image => image.size >= 1024 * 1000 * 5);
+                    if (images.value.length = 0) images.value = '';
                     return;
                 }
 
@@ -147,7 +164,7 @@ export default {
                 spanEle.addEventListener('click', () => {
                     spanEle.parentElement.remove();
                     images.value.splice(i, 1);
-                    if(images.value.length = 0) images.value = '';
+                    if (images.value.length = 0) images.value = '';
                 })
 
                 if (images.value[i].type == 'video/mp4') {
@@ -180,7 +197,7 @@ export default {
                 const videoEle = document.querySelectorAll('.video_div').length;
                 const imgEle = document.querySelectorAll('.image_div').length;
 
-                if(images.value.length > 4 || (videoEle + imgEle) > 4) {
+                if (images.value.length > 4 || (videoEle + imgEle) > 4) {
                     let errorText = document.createElement('p');
                     errorText.id = 'error_text';
                     let textNode = document.createTextNode('Tối đa 4 ảnh hoặc video');
@@ -198,20 +215,9 @@ export default {
             showImage,
             images,
             content,
+            publicImage,
         }
     },
-    data() {
-        return {
-            showCreatePostModal: this.$store.state.modal.showCreatePostModal,
-        }
-    },
-    methods: {
-    },
-    computed: {
-        next() {
-            this.selectedImage += 1;
-        }
-    }
 }
 </script>
 

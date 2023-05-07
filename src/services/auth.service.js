@@ -17,8 +17,8 @@ class AuthService {
         return (await this.api.get(`/auth/profile/${userId}`));  
     }
 
-    async getUsers(userId) {
-        return (await this.api.get(`/auth/${userId}`));
+    async getUsers(userId, limit) {
+        return (await this.api.get(`/auth/${userId}?limit=${limit}`));
     }
 
     async updateAccount(data){

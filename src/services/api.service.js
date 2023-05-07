@@ -32,7 +32,7 @@ instance.interceptors.response.use(
       const config = error.config;
       const response = error?.response;
       if (response.status === 401) {
-        alert('Phiên đăng nhập kết thúc, xin đăng nhập lại');
+        // alert('Phiên đăng nhập kết thúc, xin đăng nhập lại');
         window.location.href ="/login";
         localStorage.removeItem("token_of_hau");
         return Promise.reject(error);

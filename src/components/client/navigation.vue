@@ -205,7 +205,7 @@ export default {
         }
 
         const handleLogOut = () => {
-            localStorage.removeItem('accessToken');
+            localStorage.removeItem('token_of_hau');
             store.dispatch('auth/handleSetUser', null);
             router.push('/login');
             socket.on("disconnected");

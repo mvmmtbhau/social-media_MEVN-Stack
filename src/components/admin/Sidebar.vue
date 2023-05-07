@@ -8,15 +8,6 @@
             <p class="leading-[20px] font-bold">Dashboard</p>
         </router-link>
         <div class="pt-[15px] border-b">
-            <router-link to="/" class="flex items-center justify-between gap-[10px] py-[15px] cursor-pointer">
-                <div class="flex items-center gap-[10px] text-white">
-                    <font-awesome-icon :icon="['fas', 'list']" />
-                    <p class="text-[14px] leading-[20px] font-normal">
-                        Danh sách phòng
-                    </p>
-                </div>
-                <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-white" />
-            </router-link>
             <router-link to="/haadminha/option_reports" class="flex items-center justify-between gap-[10px] py-[15px] cursor-pointer">
                 <div class="flex items-center gap-[10px] text-white">
                     <font-awesome-icon :icon="['fas', 'list']" />
@@ -68,7 +59,7 @@ export default {
 
         const logout = () => {
             if (confirm('Bạn muốn đăng xuất?')) {
-                localStorage.removeItem("accessToken");
+                localStorage.removeItem("token_of_hau");
                 store.dispatch('auth/handleSetUser', null);
                 router.push('/login');
             }
