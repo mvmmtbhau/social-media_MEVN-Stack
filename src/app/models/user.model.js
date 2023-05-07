@@ -10,14 +10,6 @@ const UserSchema = new Schema({
     bio: {
         type: String,
     },
-    email: {
-        type: String,
-        default: '',
-    },
-    phone: {
-        type: String,
-        default: '',
-    },
     gender: {
         type: Number,
         default: 0,

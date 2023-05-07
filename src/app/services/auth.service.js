@@ -1,4 +1,4 @@
-const { User, Search, Notification } = require('../models/');
+const { User, Search, Notification, Report, Post } = require('../models/');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 
@@ -55,12 +55,12 @@ class AuthService {
                     }
                 });
 
-            if (!filterUser) return res.status(400).json({ message: "Tên đăng nhập không đúng" });
+            if (!filterUser) return res.status(400).json('Tên đăng nhập hoặc mật khẩu không đúng');
 
             const checkPassword = bcrypt.compareSync(req.body.password, filterUser.password);
 
             if (!checkPassword) {
-                return res.status(400).json({ message: 'Mật khẩu sai' });
+                return res.status(400).json('Tên đăng nhập hoặc mật khẩu không đúng');
             };
 
             const jwtToken = jwt.sign({ ...filterUser._doc }, process.env.SECRET_JWT, {
@@ -79,6 +79,7 @@ class AuthService {
     async getUserById(req, res, next) {
         try {
             const userId = req.params.id;
+
             const user = await User.findOne({
                 _id: userId,
             }, {
@@ -101,6 +102,30 @@ class AuthService {
                         select: '-userName -password',
                     }
                 });
+
+            let postIdArr = [];
+
+            const reportsPost = await Report.find({
+                fromUser: req.userId,
+                post: {
+                    $ne: null
+                },
+            });
+
+            reportsPost.forEach(report => {
+                postIdArr.push(report.post);
+            })
+
+            if (userId != req.userId) {
+                const posts = await Post.find({
+                    _id: {
+                        $nin: postIdArr,
+                    },
+                    owner: userId,
+                });
+
+                user.posts = posts;
+            }
 
             return res.status(200).send(user);
         } catch (err) {
@@ -284,7 +309,7 @@ class AuthService {
                     path: 'followUser',
                     select: '-userName -password',
                 }
-            });
+            }).limit(req.query.limit);
 
             return res.status(200).send(users);
         } catch (err) {

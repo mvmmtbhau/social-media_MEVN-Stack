@@ -6,10 +6,6 @@ const Schema = mongoose.Schema;
 
 const MessageSchema = new Schema({
     message: String,
-    read: {
-        type: Boolean,
-        default: false
-    },
     belongConversation: {
         type: mongoose.Types.ObjectId,
         ref: 'Conversation',

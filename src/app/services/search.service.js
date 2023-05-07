@@ -16,6 +16,9 @@ class SearchService {
                 },
                 _id: {
                     $ne: userId,
+                },
+                role: {
+                    $ne: 'admin'
                 }
             }, {
                 userName: 0,

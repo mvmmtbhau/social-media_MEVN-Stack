@@ -79,8 +79,9 @@ const createSocketIO = (httpServer) => {
         });
 
         socket.on("likePost", async (data) => {
+            console.log(data);
             const user =  await getUser(data.toUser._id);
-
+            console.log(user);
             if(user && user.socketId){
                 io.to(user.socketId).emit("getLikePost", data);
             }

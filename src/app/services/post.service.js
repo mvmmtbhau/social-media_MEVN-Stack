@@ -91,9 +91,11 @@ class MessageService {
                 post: postId
             });
 
-            if(report) return res.status(404).json(report);
+            if(report) return res.status(404).json({message: 'Post not found'});
 
             const post = await Post.findById(postId).populate('owner', '-userName -password -follows -hasFollowers').populate('likes');
+
+            if(!post) return res.status(404).json({message: 'Post not found'})
             return res.status(200).json(post);
         } catch (err) {
             return res.status(500).json(err);
